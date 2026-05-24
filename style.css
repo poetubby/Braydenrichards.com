@@ -92,6 +92,17 @@ body::before {
     to   { background-position: 0 4px; }
 }
 
+h1, p {
+    text-align: center;
+}
+
+.hero-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 20px auto;
+}
+
 .breadcrumb {
     font-size: 0.85em;
     margin-bottom: 24px;
