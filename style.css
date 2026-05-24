@@ -54,6 +54,7 @@ body::after {
 h1 {
     font-size: 1.6em;
     color: #00ff41;
+    text-align: center;
     text-shadow:
         0 0 5px #00ff41,
         0 0 15px #00ff41,
@@ -93,7 +94,7 @@ body::before {
     to   { background-position: 0 4px; }
 }
 
-h1, p {
+h1, p, .breadcrumb {
     text-align: center;
 }
 
