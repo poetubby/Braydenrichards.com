@@ -91,3 +91,20 @@ body::before {
     from { background-position: 0 0; }
     to   { background-position: 0 4px; }
 }
+
+.breadcrumb {
+    font-size: 0.85em;
+    margin-bottom: 24px;
+    letter-spacing: 0.05em;
+}
+
+.breadcrumb a {
+    color: #00ff41;
+    text-decoration: none;
+    text-shadow: 0 0 6px #00ff41;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+    color: #ffffff;
+}
