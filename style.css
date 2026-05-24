@@ -99,9 +99,9 @@ body::before {
 }
 
 .breadcrumb a {
-    color: #00ff41;
+    color: #ffe600;
     text-decoration: none;
-    text-shadow: 0 0 6px #00ff41;
+    text-shadow: 0 0 6px #ffe600, 0 0 12px #cc9900;
 }
 
 .breadcrumb a:hover {
