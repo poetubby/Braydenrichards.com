@@ -16,6 +16,7 @@ body {
     padding: 40px;
     position: relative;
     overflow-x: hidden;
+    text-align: center;
 }
 
 /* CRT scanline overlay */
@@ -98,7 +99,8 @@ h1, p {
 
 .hero-image {
     display: block;
-    max-width: 100%;
+    width: 25%;
+    max-width: 25%;
     height: auto;
     margin: 20px auto;
 }
