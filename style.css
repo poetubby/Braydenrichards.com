@@ -122,3 +122,14 @@ h1, p, .breadcrumb {
     text-decoration: underline;
     color: #ffffff;
 }
+
+footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid #00ff41;
+    text-align: center;
+}
+
+footer img {
+    image-rendering: pixelated;
+}
