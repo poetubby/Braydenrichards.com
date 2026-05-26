@@ -71,7 +71,7 @@
             animation: none;
         }
 
-        /* Static scanline texture at 70% of original opacity */
+        /* Scanline texture — scrolls for 5s then holds static for 90s */
         .tv-screen::after {
             content: '';
             position: absolute;
@@ -85,25 +85,15 @@
             );
             pointer-events: none;
             z-index: 1;
+            animation: scanline-pass 95s linear infinite;
         }
 
-        /* Single sweep line — one pass top to bottom every 90 seconds */
-        .tv-screen::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.07);
-            box-shadow: 0 0 6px rgba(255, 255, 255, 0.04);
-            animation: sweep 90s linear infinite;
-            pointer-events: none;
-            z-index: 2;
-        }
-
-        @keyframes sweep {
-            from { top: 0%; }
-            to   { top: 100%; }
+        /* 5s sweep (5/95 = 5.26%), then 90s static.
+           400px = 100 × 4px repeat, so start and end look identical — no jump on loop. */
+        @keyframes scanline-pass {
+            0%     { background-position: 0 0; }
+            5.26%  { background-position: 0 400px; }
+            100%   { background-position: 0 400px; }
         }
 
         .click-audio {
