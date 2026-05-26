@@ -65,7 +65,13 @@
             height: auto;
         }
 
-        /* CRT screen flicker on top of the video */
+        /* Disable the rapid global scanline scroll on this page */
+        body::before {
+            opacity: 0.2;
+            animation: none;
+        }
+
+        /* Static scanline texture at 70% of original opacity */
         .tv-screen::after {
             content: '';
             position: absolute;
@@ -74,10 +80,30 @@
                 0deg,
                 transparent,
                 transparent 2px,
-                rgba(0, 0, 0, 0.08) 2px,
-                rgba(0, 0, 0, 0.08) 4px
+                rgba(0, 0, 0, 0.056) 2px,
+                rgba(0, 0, 0, 0.056) 4px
             );
             pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Single sweep line — one pass top to bottom every 90 seconds */
+        .tv-screen::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.04);
+            animation: sweep 90s linear infinite;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @keyframes sweep {
+            from { top: 0%; }
+            to   { top: 100%; }
         }
 
         .click-audio {
@@ -117,6 +143,11 @@
             color: #0a0a00;
             text-shadow: none;
         }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+        }
     </style>
 </head>
 <body>
@@ -139,7 +170,10 @@
         </div>
 
         <p class="click-audio" id="audio-hint" onclick="toggleAudio()">[ Click for Audio ]</p>
-        <button class="btn-channel" onclick="changeChannel()">Change Channel</button>
+        <div class="btn-row">
+            <button class="btn-channel" onclick="changeChannel()">Change Channel</button>
+            <button class="btn-channel" onclick="toggleFullscreen()">Full Screen</button>
+        </div>
         <p class="tv-footer-info" id="tv-status">[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]</p>
     </div>
 
@@ -151,7 +185,7 @@
     <script>
         const video   = document.getElementById('tv-video');
         const status  = document.getElementById('tv-status');
-        const COMMERCIAL_INTERVAL_MS = 15 * 60 * 1000;
+        const COMMERCIAL_INTERVAL_MS = 12 * 60 * 1000;
 
         let playlist            = null;
         let inCommercial        = false;
@@ -265,7 +299,7 @@
             lastTimestamp = null;
             video.loop    = false;
 
-            playNextCommercial(3, -1);
+            playNextCommercial(4, -1);
         }
 
         function playNextCommercial(remaining, lastIdx) {
@@ -278,12 +312,21 @@
             let idx;
             do { idx = Math.floor(Math.random() * items.length); } while (idx === lastIdx && items.length > 1);
 
-            status.textContent = `[ COMMERCIAL BREAK — ${4 - remaining} OF 3 ]`;
+            status.textContent = `[ COMMERCIAL BREAK — ${5 - remaining} OF 4 ]`;
             video.src = items[idx].url;
             video.currentTime = 0;
             video.play();
 
             video.addEventListener('ended', () => playNextCommercial(remaining - 1, idx), { once: true });
+        }
+
+        function toggleFullscreen() {
+            const screen = document.querySelector('.tv-screen');
+            if (!document.fullscreenElement) {
+                screen.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
         }
 
         function toggleAudio() {
