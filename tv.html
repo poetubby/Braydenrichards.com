@@ -97,6 +97,26 @@
             color: #005a17;
             letter-spacing: 0.1em;
         }
+
+        .btn-channel {
+            background: transparent;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: 0.85em;
+            padding: 8px 22px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-shadow: 0 0 6px #00ff41;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .btn-channel:hover {
+            background: #00ff41;
+            color: #0a0a00;
+            text-shadow: none;
+        }
     </style>
 </head>
 <body>
@@ -108,20 +128,19 @@
 
     <div class="tv-container">
         <div class="tv-header">
-            <span class="channel-id">CH. 1</span>
+            <span class="channel-id" id="channel-id">CH. 1</span>
             <span class="live-badge">
                 <span class="live-dot"></span> LIVE
             </span>
         </div>
 
         <div class="tv-screen">
-            <video id="tv-video" muted loop playsinline>
-                <source src="https://ia601306.us.archive.org/31/items/harry-potter-and-the-sorcerers-stone-vhs/harry%20potter%20and%20the%20sorcerer%27s%20stone%20%28VHS%29.mp4" type="video/mp4">
-            </video>
+            <video id="tv-video" muted playsinline></video>
         </div>
 
         <p class="click-audio" id="audio-hint" onclick="toggleAudio()">[ Click for Audio ]</p>
-        <p class="tv-footer-info">[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]</p>
+        <button class="btn-channel" onclick="changeChannel()">Change Channel</button>
+        <p class="tv-footer-info" id="tv-status">[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]</p>
     </div>
 
     <footer>
@@ -130,12 +149,142 @@
     </footer>
 
     <script>
-        const video = document.getElementById('tv-video');
+        const video   = document.getElementById('tv-video');
+        const status  = document.getElementById('tv-status');
+        const COMMERCIAL_INTERVAL_MS = 15 * 60 * 1000;
 
-        video.addEventListener('loadedmetadata', () => {
-            video.currentTime = Math.random() * video.duration;
-            video.play();
+        let playlist            = null;
+        let inCommercial        = false;
+        let totalPlayedMs       = 0;
+        let lastTimestamp       = null;
+        let savedSrc            = null;
+        let savedTime           = 0;
+        let currentChannelIndex = 0;
+        let lastChannelIndex    = -1;
+
+        // Track real elapsed playback time (ignores pauses / buffering)
+        video.addEventListener('timeupdate', () => {
+            if (inCommercial || lastTimestamp === null) return;
+            totalPlayedMs += Date.now() - lastTimestamp;
+            lastTimestamp  = Date.now();
+            if (totalPlayedMs >= COMMERCIAL_INTERVAL_MS) {
+                totalPlayedMs = 0;
+                playCommercial();
+            }
         });
+        video.addEventListener('playing', () => { lastTimestamp = Date.now(); });
+        video.addEventListener('pause',   () => { lastTimestamp = null; });
+        video.addEventListener('waiting', () => { lastTimestamp = null; });
+
+        async function init() {
+            const res  = await fetch('tv-playlist.json');
+            playlist   = await res.json();
+            startMainContent();
+        }
+
+        function setChannelDisplay(index) {
+            document.getElementById('channel-id').textContent = 'CH. ' + (index + 1);
+        }
+
+        // Pick a random index, never matching avoidIndex (unless only 1 video exists)
+        function pickIndex(avoidIndex) {
+            const len = playlist.mainContent.length;
+            if (len === 1) return 0;
+            let idx;
+            do { idx = Math.floor(Math.random() * len); } while (idx === avoidIndex);
+            return idx;
+        }
+
+        function onMainEnded() {
+            // Auto-play next video — never the same one back-to-back
+            lastChannelIndex    = currentChannelIndex;
+            currentChannelIndex = pickIndex(lastChannelIndex);
+            totalPlayedMs       = 0;
+            setChannelDisplay(currentChannelIndex);
+            status.textContent  = '[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]';
+            video.src = playlist.mainContent[currentChannelIndex].url;
+            video.addEventListener('loadedmetadata', () => {
+                video.currentTime = 0;
+                video.play();
+            }, { once: true });
+            video.addEventListener('ended', onMainEnded, { once: true });
+        }
+
+        function startMainContent(resume = false) {
+            inCommercial = false;
+            video.loop   = false;
+            status.textContent = '[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]';
+            video.removeEventListener('ended', onMainEnded);
+
+            if (resume && savedSrc) {
+                setChannelDisplay(currentChannelIndex);
+                video.src = savedSrc;
+                video.addEventListener('loadedmetadata', () => {
+                    video.currentTime = savedTime;
+                    video.play();
+                }, { once: true });
+            } else {
+                currentChannelIndex = pickIndex(lastChannelIndex);
+                setChannelDisplay(currentChannelIndex);
+                video.src = playlist.mainContent[currentChannelIndex].url;
+                video.addEventListener('loadedmetadata', () => {
+                    video.currentTime = Math.random() * video.duration;
+                    video.play();
+                }, { once: true });
+            }
+
+            video.addEventListener('ended', onMainEnded, { once: true });
+        }
+
+        function changeChannel() {
+            if (!playlist) return;
+            // Any channel is fair game including the current one (like real TV)
+            video.removeEventListener('ended', onMainEnded);
+            currentChannelIndex = Math.floor(Math.random() * playlist.mainContent.length);
+            totalPlayedMs  = 0;
+            savedSrc       = null;
+            inCommercial   = false;
+            video.loop     = false;
+            setChannelDisplay(currentChannelIndex);
+            status.textContent = '[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]';
+            video.src = playlist.mainContent[currentChannelIndex].url;
+            video.addEventListener('loadedmetadata', () => {
+                video.currentTime = Math.random() * video.duration;
+                video.play();
+            }, { once: true });
+            video.addEventListener('ended', onMainEnded, { once: true });
+        }
+
+        function playCommercial() {
+            if (!playlist.commercials.length) return;
+            video.removeEventListener('ended', onMainEnded);
+
+            savedSrc      = video.src;
+            savedTime     = video.currentTime;
+            inCommercial  = true;
+            lastTimestamp = null;
+            video.loop    = false;
+
+            playNextCommercial(3, -1);
+        }
+
+        function playNextCommercial(remaining, lastIdx) {
+            if (remaining === 0) {
+                startMainContent(true);
+                return;
+            }
+
+            const items = playlist.commercials;
+            let idx;
+            do { idx = Math.floor(Math.random() * items.length); } while (idx === lastIdx && items.length > 1);
+
+            status.textContent = `[ COMMERCIAL BREAK — ${4 - remaining} OF 3 ]`;
+            video.src = items[idx].url;
+            video.currentTime = 0;
+            video.play();
+
+            video.addEventListener('ended', () => playNextCommercial(remaining - 1, idx), { once: true });
+        }
 
         function toggleAudio() {
             video.muted = !video.muted;
@@ -143,6 +292,8 @@
                 ? '[ Click for Audio ]'
                 : '[ Click to Mute ]';
         }
+
+        init();
     </script>
 </body>
 </html>
