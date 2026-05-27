@@ -190,8 +190,13 @@
 <body>
     <div id="gate">
         <h2>BRAYDEN TV</h2>
+        <p>The Gentle ______</p>
+        <p style="color:#005a17">Email/text me if you don't know</p>
+        <input id="gate-input" type="password" placeholder="PASSWORD" autocomplete="off"
+            style="background:transparent;border:1px solid #00ff41;color:#00ff41;font-family:'Share Tech Mono','Courier New',monospace;font-size:1em;padding:10px 20px;letter-spacing:0.2em;text-align:center;outline:none;width:220px;"
+            onkeydown="if(event.key==='Enter')enterSite()">
         <button class="enter-btn" onclick="enterSite()">[ ENTER ]</button>
-        <p>SIGNAL READY — AWAITING INPUT</p>
+        <p id="gate-error" style="color:#ff2200;text-shadow:0 0 6px #ff2200;display:none;">[ INCORRECT — TRY AGAIN ]</p>
     </div>
 
     <nav class="breadcrumb">
@@ -227,8 +232,14 @@
 
     <script>
         function enterSite() {
-            sessionStorage.setItem('tv-access', '1');
-            document.getElementById('gate').style.display = 'none';
+            const val = document.getElementById('gate-input').value.trim().toLowerCase();
+            if (val === 'peaches') {
+                sessionStorage.setItem('tv-access', '1');
+                document.getElementById('gate').style.display = 'none';
+            } else {
+                document.getElementById('gate-error').style.display = 'block';
+                document.getElementById('gate-input').value = '';
+            }
         }
 
         if (sessionStorage.getItem('tv-access')) {
