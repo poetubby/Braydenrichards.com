@@ -34,9 +34,13 @@
 
     <div class="audio-player">
         <p class="audio-label">[ NOW PLAYING — WILL YOU BE THERE ]</p>
-        <audio controls autoplay loop>
+        <audio id="mj-audio" controls autoplay muted loop>
             <source src="https://dn711005.ca.archive.org/0/items/basil-poledouris-free-willy-original-motion-picture-soundtrack/01%20Will%20You%20Be%20There%20%28Theme%20From%20Free%20Willy%29.mp3" type="audio/mpeg">
         </audio>
+        <script>
+            const mjAudio = document.getElementById('mj-audio');
+            mjAudio.play().then(() => { mjAudio.muted = false; }).catch(() => {});
+        </script>
     </div>
 
 <img src="Assets/Images/Michael Jackson Smile.jpg" class="hero-image" alt="Michael Jackson">

@@ -61,16 +61,12 @@
       "title": "Mickey's House of Villains (2002 DVD)"
     },
     {
-      "url": "https://ia800402.us.archive.org/1/items/the-magic-school-bus-full-series-via-tubi/Season%202/S02E04%20-%20The%20Busasaurus.mp4",
-      "title": "The Magic School Bus S02E04 - The Busasaurus"
-    },
-    {
-      "url": "https://ia800402.us.archive.org/1/items/the-magic-school-bus-full-series-via-tubi/Season%202/S02E10%20-%20Getting%20Energized.mp4",
-      "title": "The Magic School Bus S02E10 - Getting Energized"
-    },
-    {
-      "url": "https://dn710209.ca.archive.org/0/items/the-magic-school-bus-full-series-via-tubi/Season%204/S04E10%20-%20Makes%20a%20Stink.mp4",
-      "title": "The Magic School Bus S04E10 - Makes a Stink"
+      "title": "The Magic School Bus",
+      "episodes": [
+        { "url": "https://ia800402.us.archive.org/1/items/the-magic-school-bus-full-series-via-tubi/Season%202/S02E04%20-%20The%20Busasaurus.mp4", "title": "The Magic School Bus S02E04 - The Busasaurus" },
+        { "url": "https://ia800402.us.archive.org/1/items/the-magic-school-bus-full-series-via-tubi/Season%202/S02E10%20-%20Getting%20Energized.mp4", "title": "The Magic School Bus S02E10 - Getting Energized" },
+        { "url": "https://dn710209.ca.archive.org/0/items/the-magic-school-bus-full-series-via-tubi/Season%204/S04E10%20-%20Makes%20a%20Stink.mp4", "title": "The Magic School Bus S04E10 - Makes a Stink" }
+      ]
     },
     {
       "url": "https://ia902904.us.archive.org/10/items/all-animated-and-live-action-and-movies-and-tv-shows-and-vhs-and-laserdisc-and-d/Finding%20Nemo%202003%20DVD%20Disc%202%20Full%20Frame.mp4",
@@ -121,56 +117,27 @@
       "title": "Whisper of the Heart (Japanese VHS)"
     },
     {
-      "url": "https://ia802809.us.archive.org/17/items/80s-wpix-woc-star-trek-10.5.87-the-naked-now-10.12.87-code-of-honor/08%20Tapestry%20%281993%29.mp4",
-      "title": "Star Trek TNG: Tapestry (1993)"
+      "title": "Star Trek: The Next Generation",
+      "episodes": [
+        { "url": "https://ia902809.us.archive.org/17/items/80s-wpix-woc-star-trek-10.5.87-the-naked-now-10.12.87-code-of-honor/80%27s%20WPIX%20WOC%20-%20Star%20Trek%20the%20Next%20Generation%209.28.87%20encounter%20at%20farpoint%20SERIES%20PREMIERE.mp4", "title": "Star Trek TNG: Encounter at Farpoint - Series Premiere (1987)" },
+        { "url": "https://ia902809.us.archive.org/17/items/80s-wpix-woc-star-trek-10.5.87-the-naked-now-10.12.87-code-of-honor/04%20Sins%20of%20the%20Father%20%281989%29.mp4", "title": "Star Trek TNG: Sins of the Father (1989)" },
+        { "url": "https://ia802809.us.archive.org/17/items/80s-wpix-woc-star-trek-10.5.87-the-naked-now-10.12.87-code-of-honor/08%20Tapestry%20%281993%29.mp4", "title": "Star Trek TNG: Tapestry (1993)" }
+      ]
     },
     {
-      "url": "https://ia902809.us.archive.org/17/items/80s-wpix-woc-star-trek-10.5.87-the-naked-now-10.12.87-code-of-honor/80%27s%20WPIX%20WOC%20-%20Star%20Trek%20the%20Next%20Generation%209.28.87%20encounter%20at%20farpoint%20SERIES%20PREMIERE.mp4",
-      "title": "Star Trek TNG: Encounter at Farpoint - Series Premiere (1987)"
-    },
-    {
-      "url": "https://ia902809.us.archive.org/17/items/80s-wpix-woc-star-trek-10.5.87-the-naked-now-10.12.87-code-of-honor/04%20Sins%20of%20the%20Father%20%281989%29.mp4",
-      "title": "Star Trek TNG: Sins of the Father (1989)"
-    },
-    {
-      "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20peaks%20disk%201/International%20Pilot.mp4",
-      "title": "Twin Peaks: International Pilot"
-    },
-    {
-      "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20Peaks%20Disk%202/Season%201%20Episode%202%20-%20Zen%20Or%20The%20Skill%20To%20Catch%20A%20Killer.mp4",
-      "title": "Twin Peaks S01E02 - Zen, Or The Skill To Catch A Killer"
-    },
-    {
-      "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20Peaks%20Disk%202/Season%201%20Episode%203%20-%20Rest%20In%20Pain.mp4",
-      "title": "Twin Peaks S01E03 - Rest In Pain"
-    },
-    {
-      "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20Peaks%20Disk%202/Season%201%20Episode%204%20-%20%20The%20One-Armed%20Man.mp4",
-      "title": "Twin Peaks S01E04 - The One-Armed Man"
-    },
-    {
-      "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20Peaks%20Disk%203/Season%201%20Episode%205%20-%20Cooper%27s%20Dreams.mp4",
-      "title": "Twin Peaks S01E05 - Cooper's Dreams"
-    },
-    {
-      "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20Peaks%20Disk%203/Season%201%20Episode%206%20-%20Realization%20Time.mp4",
-      "title": "Twin Peaks S01E06 - Realization Time"
-    },
-    {
-      "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20Peaks%20Disk%203/Season%201%20Episode%207%20-%20The%20Last%20Evening.mp4",
-      "title": "Twin Peaks S01E07 - The Last Evening"
-    },
-    {
-      "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20peaks%20disk%209/Season%202%20Episode%2020%20-%20The%20Path%20To%20The%20Black%20House.mp4",
-      "title": "Twin Peaks S02E20 - The Path To The Black House"
-    },
-    {
-      "url": "https://ia800604.us.archive.org/20/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20peaks%20disk%209/Season%202%20Episode%2022%20-%20Beyond%20Life%20And%20Death.mp4",
-      "title": "Twin Peaks S02E22 - Beyond Life And Death"
-    },
-    {
-      "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20peaks%20disk%209/Season%202%20Episode%2021%20Miss%20Twin%20Peaks.mp4",
-      "title": "Twin Peaks S02E21 - Miss Twin Peaks"
+      "title": "Twin Peaks",
+      "episodes": [
+        { "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20peaks%20disk%201/International%20Pilot.mp4", "title": "Twin Peaks: International Pilot" },
+        { "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20Peaks%20Disk%202/Season%201%20Episode%202%20-%20Zen%20Or%20The%20Skill%20To%20Catch%20A%20Killer.mp4", "title": "Twin Peaks S01E02 - Zen, Or The Skill To Catch A Killer" },
+        { "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20Peaks%20Disk%202/Season%201%20Episode%203%20-%20Rest%20In%20Pain.mp4", "title": "Twin Peaks S01E03 - Rest In Pain" },
+        { "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20Peaks%20Disk%202/Season%201%20Episode%204%20-%20%20The%20One-Armed%20Man.mp4", "title": "Twin Peaks S01E04 - The One-Armed Man" },
+        { "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20Peaks%20Disk%203/Season%201%20Episode%205%20-%20Cooper%27s%20Dreams.mp4", "title": "Twin Peaks S01E05 - Cooper's Dreams" },
+        { "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20Peaks%20Disk%203/Season%201%20Episode%206%20-%20Realization%20Time.mp4", "title": "Twin Peaks S01E06 - Realization Time" },
+        { "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20Peaks%20Disk%203/Season%201%20Episode%207%20-%20The%20Last%20Evening.mp4", "title": "Twin Peaks S01E07 - The Last Evening" },
+        { "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20peaks%20disk%209/Season%202%20Episode%2020%20-%20The%20Path%20To%20The%20Black%20House.mp4", "title": "Twin Peaks S02E20 - The Path To The Black House" },
+        { "url": "https://dn721509.ca.archive.org/0/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20peaks%20disk%209/Season%202%20Episode%2021%20Miss%20Twin%20Peaks.mp4", "title": "Twin Peaks S02E21 - Miss Twin Peaks" },
+        { "url": "https://ia800604.us.archive.org/20/items/season-2-episode-8-drive-with-a-dead-girl/Twin%20peaks%20disk%209/Season%202%20Episode%2022%20-%20Beyond%20Life%20And%20Death.mp4", "title": "Twin Peaks S02E22 - Beyond Life And Death" }
+      ]
     },
     {
       "url": "https://dn720305.ca.archive.org/0/items/ThanksgivingNight1997Tape/Jurassic%20Park.mp4",

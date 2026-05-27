@@ -65,6 +65,53 @@
             height: auto;
         }
 
+        #gate {
+            position: fixed;
+            inset: 0;
+            background: #0a0a00;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            z-index: 100;
+            cursor: pointer;
+        }
+
+        #gate h2 {
+            font-size: 1.4em;
+            letter-spacing: 0.3em;
+            text-shadow: 0 0 12px #00ff41;
+            animation: flicker 3s infinite;
+            margin: 0;
+        }
+
+        #gate p {
+            font-size: 0.75em;
+            letter-spacing: 0.2em;
+            color: #005a17;
+            margin: 0;
+        }
+
+        #gate .enter-btn {
+            border: 1px solid #00ff41;
+            padding: 12px 40px;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: 1em;
+            letter-spacing: 0.25em;
+            color: #00ff41;
+            text-shadow: 0 0 8px #00ff41;
+            background: transparent;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        #gate .enter-btn:hover {
+            background: #00ff41;
+            color: #0a0a00;
+            text-shadow: none;
+        }
+
         /* Disable the rapid global scanline scroll on this page */
         body::before {
             opacity: 0.2;
@@ -141,6 +188,12 @@
     </style>
 </head>
 <body>
+    <div id="gate">
+        <h2>BRAYDEN TV</h2>
+        <button class="enter-btn" onclick="enterSite()">[ ENTER ]</button>
+        <p>SIGNAL READY — AWAITING INPUT</p>
+    </div>
+
     <nav class="breadcrumb">
         <a href="index.html">Home</a> &rsaquo; Brayden TV
     </nav>
@@ -173,6 +226,15 @@
     </footer>
 
     <script>
+        function enterSite() {
+            sessionStorage.setItem('tv-access', '1');
+            document.getElementById('gate').style.display = 'none';
+        }
+
+        if (sessionStorage.getItem('tv-access')) {
+            document.getElementById('gate').style.display = 'none';
+        }
+
         const video   = document.getElementById('tv-video');
         const status  = document.getElementById('tv-status');
         const COMMERCIAL_INTERVAL_MS = 12 * 60 * 1000;
@@ -219,6 +281,16 @@
             return idx;
         }
 
+        // Resolve a mainContent entry to { url, title }.
+        // If the entry is a series (has episodes), picks a random episode.
+        function resolveEntry(index) {
+            const entry = playlist.mainContent[index];
+            if (entry.episodes && entry.episodes.length) {
+                return entry.episodes[Math.floor(Math.random() * entry.episodes.length)];
+            }
+            return entry;
+        }
+
         function onMainEnded() {
             // Auto-play next video — never the same one back-to-back
             lastChannelIndex    = currentChannelIndex;
@@ -226,7 +298,7 @@
             totalPlayedMs       = 0;
             setChannelDisplay(currentChannelIndex);
             status.textContent  = '[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]';
-            video.src = playlist.mainContent[currentChannelIndex].url;
+            video.src = resolveEntry(currentChannelIndex).url;
             video.addEventListener('loadedmetadata', () => {
                 video.currentTime = 0;
                 video.play().catch(() => {});
@@ -251,7 +323,7 @@
             } else {
                 currentChannelIndex = pickIndex(lastChannelIndex);
                 setChannelDisplay(currentChannelIndex);
-                video.src = playlist.mainContent[currentChannelIndex].url;
+                video.src = resolveEntry(currentChannelIndex).url;
                 video.addEventListener('loadedmetadata', () => {
                     video.currentTime = Math.random() * video.duration;
                     video.play();
@@ -272,7 +344,7 @@
             video.loop     = false;
             setChannelDisplay(currentChannelIndex);
             status.textContent = '[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]';
-            video.src = playlist.mainContent[currentChannelIndex].url;
+            video.src = resolveEntry(currentChannelIndex).url;
             video.addEventListener('loadedmetadata', () => {
                 video.currentTime = Math.random() * video.duration;
                 video.play();
