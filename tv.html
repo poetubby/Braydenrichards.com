@@ -78,19 +78,58 @@
             cursor: pointer;
         }
 
+        @keyframes gate-breathe {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.5; }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0; }
+        }
+
         #gate h2 {
             font-size: 1.4em;
             letter-spacing: 0.3em;
-            text-shadow: 0 0 12px #00ff41;
-            animation: flicker 3s infinite;
+            color: #00ff41;
+            animation: gate-breathe 2.5s ease-in-out infinite;
             margin: 0;
         }
 
-        #gate p {
-            font-size: 0.75em;
+        #gate .gate-hint {
+            font-size: 0.85em;
             letter-spacing: 0.2em;
-            color: #005a17;
+            color: #00ff41;
             margin: 0;
+        }
+
+        #gate .gate-hint::after {
+            content: '_';
+            animation: blink 1s step-start infinite;
+        }
+
+        #gate .gate-sub {
+            font-size: 0.7em;
+            letter-spacing: 0.15em;
+            color: #3a7a4a;
+            margin: 0;
+        }
+
+        #gate input {
+            background: transparent;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: 1em;
+            padding: 10px 20px;
+            letter-spacing: 0.2em;
+            text-align: center;
+            outline: none;
+            width: 220px;
+        }
+
+        #gate input::placeholder {
+            color: #3a7a4a;
         }
 
         #gate .enter-btn {
@@ -100,7 +139,6 @@
             font-size: 1em;
             letter-spacing: 0.25em;
             color: #00ff41;
-            text-shadow: 0 0 8px #00ff41;
             background: transparent;
             cursor: pointer;
             transition: background 0.15s, color 0.15s;
@@ -109,7 +147,6 @@
         #gate .enter-btn:hover {
             background: #00ff41;
             color: #0a0a00;
-            text-shadow: none;
         }
 
         /* Disable the rapid global scanline scroll on this page */
@@ -190,13 +227,12 @@
 <body>
     <div id="gate">
         <h2>BRAYDEN TV</h2>
-        <p>The Gentle ______</p>
-        <p style="color:#005a17">Email/text me if you don't know</p>
+        <p class="gate-hint">The Gentle ______</p>
+        <p class="gate-sub">Email/text me if you don't know</p>
         <input id="gate-input" type="password" placeholder="PASSWORD" autocomplete="off"
-            style="background:transparent;border:1px solid #00ff41;color:#00ff41;font-family:'Share Tech Mono','Courier New',monospace;font-size:1em;padding:10px 20px;letter-spacing:0.2em;text-align:center;outline:none;width:220px;"
             onkeydown="if(event.key==='Enter')enterSite()">
         <button class="enter-btn" onclick="enterSite()">[ ENTER ]</button>
-        <p id="gate-error" style="color:#ff2200;text-shadow:0 0 6px #ff2200;display:none;">[ INCORRECT — TRY AGAIN ]</p>
+        <p id="gate-error" style="color:#ff2200;display:none;">[ INCORRECT — TRY AGAIN ]</p>
     </div>
 
     <nav class="breadcrumb">
