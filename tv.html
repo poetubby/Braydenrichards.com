@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brayden TV</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .tv-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .tv-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            letter-spacing: 0.15em;
+            font-size: 0.85em;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ff2200;
+            text-shadow: 0 0 8px #ff2200;
+            font-size: 0.9em;
+            letter-spacing: 0.2em;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff2200;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #ff2200;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.1; }
+        }
+
+        .channel-id {
+            color: #00ff41;
+            text-shadow: 0 0 6px #00ff41;
+        }
+
+        .tv-screen {
+            position: relative;
+            width: 100%;
+            max-width: 860px;
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 20px #00ff41, 0 0 60px rgba(0, 255, 65, 0.2);
+        }
+
+        .tv-screen video {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* Disable the rapid global scanline scroll on this page */
+        body::before {
+            opacity: 0.2;
+            animation: none;
+        }
+
+        /* Scanline texture — scrolls for 5s then holds static for 90s */
+        .tv-screen::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.056) 2px,
+                rgba(0, 0, 0, 0.056) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+            animation: scanline-pass 95s linear infinite;
+        }
+
+        /* 5s sweep (5/95 = 5.26%), then 90s static.
+           400px = 100 × 4px repeat, so start and end look identical — no jump on loop. */
+        @keyframes scanline-pass {
+            0%     { background-position: 0 0; }
+            5.26%  { background-position: 0 400px; }
+            100%   { background-position: 0 400px; }
+        }
+
+        .click-audio {
+            font-size: 0.85em;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            color: #ffe600;
+            text-shadow: 0 0 6px #ffe600, 0 0 12px #cc9900;
+        }
+
+        .click-audio:hover {
+            color: #ffffff;
+        }
+
+        .tv-footer-info {
+            font-size: 0.72em;
+            color: #005a17;
+            letter-spacing: 0.1em;
+        }
+
+        .btn-channel {
+            background: transparent;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: 0.85em;
+            padding: 8px 22px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-shadow: 0 0 6px #00ff41;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .btn-channel:hover {
+            background: #00ff41;
+            color: #0a0a00;
+            text-shadow: none;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="index.html">Home</a> &rsaquo; Brayden TV
+    </nav>
+
+    <h1>Brayden TV</h1>
+
+    <div class="tv-container">
+        <div class="tv-header">
+            <span class="channel-id" id="channel-id">CH. 1</span>
+            <span class="live-badge">
+                <span class="live-dot"></span> LIVE
+            </span>
+        </div>
+
+        <div class="tv-screen">
+            <video id="tv-video" muted playsinline></video>
+        </div>
+
+        <p class="click-audio" id="audio-hint" onclick="toggleAudio()">[ Click for Audio ]</p>
+        <div class="btn-row">
+            <button class="btn-channel" onclick="changeChannel()">Change Channel</button>
+            <button class="btn-channel" onclick="toggleFullscreen()">Full Screen</button>
+        </div>
+        <p class="tv-footer-info" id="tv-status">[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]</p>
+    </div>
+
+    <footer>
+        <p>Visit my Ole Pal Jake's Site.</p>
+        <a href="https://jakewel.ch"><img src="Assets/Images/88x31.gif" alt="jakewel.ch"></a>
+    </footer>
+
+    <script>
+        const video   = document.getElementById('tv-video');
+        const status  = document.getElementById('tv-status');
+        const COMMERCIAL_INTERVAL_MS = 12 * 60 * 1000;
+
+        let playlist            = null;
+        let inCommercial        = false;
+        let totalPlayedMs       = 0;
+        let lastTimestamp       = null;
+        let savedSrc            = null;
+        let savedTime           = 0;
+        let currentChannelIndex = 0;
+        let lastChannelIndex    = -1;
+
+        // Track real elapsed playback time (ignores pauses / buffering)
+        video.addEventListener('timeupdate', () => {
+            if (inCommercial || lastTimestamp === null) return;
+            totalPlayedMs += Date.now() - lastTimestamp;
+            lastTimestamp  = Date.now();
+            if (totalPlayedMs >= COMMERCIAL_INTERVAL_MS) {
+                totalPlayedMs = 0;
+                playCommercial();
+            }
+        });
+        video.addEventListener('playing', () => { lastTimestamp = Date.now(); });
+        video.addEventListener('pause',   () => { lastTimestamp = null; });
+        video.addEventListener('waiting', () => { lastTimestamp = null; });
+
+        async function init() {
+            const res  = await fetch('tv-playlist.json');
+            playlist   = await res.json();
+            startMainContent();
+        }
+
+        function setChannelDisplay(index) {
+            document.getElementById('channel-id').textContent = 'CH. ' + (index + 1);
+        }
+
+        // Pick a random index, never matching avoidIndex (unless only 1 video exists)
+        function pickIndex(avoidIndex) {
+            const len = playlist.mainContent.length;
+            if (len === 1) return 0;
+            let idx;
+            do { idx = Math.floor(Math.random() * len); } while (idx === avoidIndex);
+            return idx;
+        }
+
+        function onMainEnded() {
+            // Auto-play next video — never the same one back-to-back
+            lastChannelIndex    = currentChannelIndex;
+            currentChannelIndex = pickIndex(lastChannelIndex);
+            totalPlayedMs       = 0;
+            setChannelDisplay(currentChannelIndex);
+            status.textContent  = '[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]';
+            video.src = playlist.mainContent[currentChannelIndex].url;
+            video.addEventListener('loadedmetadata', () => {
+                video.currentTime = 0;
+                video.play().catch(() => {});
+            }, { once: true });
+            video.addEventListener('error', onMainEnded, { once: true });
+            video.addEventListener('ended', onMainEnded, { once: true });
+        }
+
+        function startMainContent(resume = false) {
+            inCommercial = false;
+            video.loop   = false;
+            status.textContent = '[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]';
+            video.removeEventListener('ended', onMainEnded);
+
+            if (resume && savedSrc) {
+                setChannelDisplay(currentChannelIndex);
+                video.src = savedSrc;
+                video.addEventListener('loadedmetadata', () => {
+                    video.currentTime = savedTime;
+                    video.play();
+                }, { once: true });
+            } else {
+                currentChannelIndex = pickIndex(lastChannelIndex);
+                setChannelDisplay(currentChannelIndex);
+                video.src = playlist.mainContent[currentChannelIndex].url;
+                video.addEventListener('loadedmetadata', () => {
+                    video.currentTime = Math.random() * video.duration;
+                    video.play();
+                }, { once: true });
+            }
+
+            video.addEventListener('ended', onMainEnded, { once: true });
+        }
+
+        function changeChannel() {
+            if (!playlist) return;
+            // Any channel is fair game including the current one (like real TV)
+            video.removeEventListener('ended', onMainEnded);
+            currentChannelIndex = Math.floor(Math.random() * playlist.mainContent.length);
+            totalPlayedMs  = 0;
+            savedSrc       = null;
+            inCommercial   = false;
+            video.loop     = false;
+            setChannelDisplay(currentChannelIndex);
+            status.textContent = '[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]';
+            video.src = playlist.mainContent[currentChannelIndex].url;
+            video.addEventListener('loadedmetadata', () => {
+                video.currentTime = Math.random() * video.duration;
+                video.play();
+            }, { once: true });
+            video.addEventListener('ended', onMainEnded, { once: true });
+        }
+
+        function playCommercial() {
+            if (!playlist.commercials.length) return;
+            video.removeEventListener('ended', onMainEnded);
+
+            savedSrc      = video.src;
+            savedTime     = video.currentTime;
+            inCommercial  = true;
+            lastTimestamp = null;
+            video.loop    = false;
+
+            playNextCommercial(4, -1);
+        }
+
+        function playNextCommercial(remaining, lastIdx) {
+            if (remaining === 0) {
+                startMainContent(true);
+                return;
+            }
+
+            const items = playlist.commercials;
+            let idx;
+            do { idx = Math.floor(Math.random() * items.length); } while (idx === lastIdx && items.length > 1);
+
+            status.textContent = `[ COMMERCIAL BREAK — ${5 - remaining} OF 4 ]`;
+            video.src = items[idx].url;
+            video.currentTime = 0;
+            video.play().catch(() => {});
+
+            const onEnded = () => {
+                video.removeEventListener('error', onError);
+                playNextCommercial(remaining - 1, idx);
+            };
+            const onError = () => {
+                video.removeEventListener('ended', onEnded);
+                playNextCommercial(remaining - 1, idx);
+            };
+            video.addEventListener('ended', onEnded, { once: true });
+            video.addEventListener('error', onError, { once: true });
+        }
+
+        function toggleFullscreen() {
+            const screen = document.querySelector('.tv-screen');
+            if (!document.fullscreenElement) {
+                screen.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function toggleAudio() {
+            video.muted = !video.muted;
+            document.getElementById('audio-hint').textContent = video.muted
+                ? '[ Click for Audio ]'
+                : '[ Click to Mute ]';
+        }
+
+        init();
+    </script>
+</body>
+</html>
