@@ -3,7 +3,9 @@
     "allow": [
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(ssh -o StrictHostKeyChecking=no poetubby@192.168.86.40 \"ls /home/poetubby/rpi_printer/sources/ && echo '---' && ls /home/poetubby/rpi_printer/triggers/ && echo '---' && ls /home/poetubby/rpi_printer/scheduler/\")",
+      "Bash(ssh -o StrictHostryKeyChecking=no poetubby@192.168.86.40 \"cat /home/poetubby/rpi_printer/printer/handler.py && echo '===SCHEDULER===' && cat /home/poetubby/rpi_printer/scheduler/jobs.py && echo '===WEATHER_SUMMARY===' && cat /home/poetubby/rpi_printer/sources/weather_summary.py\")"
     ]
   }
 }
