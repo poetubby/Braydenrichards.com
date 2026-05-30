@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply the Oracle</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .oracle-wrap {
+            max-width: 580px;
+            margin: 0 auto;
+        }
+
+        .oracle-lore {
+            margin: 0 auto 2rem;
+            line-height: 2;
+            text-shadow: 0 0 4px #00ff41, 0 0 10px #00aa2a;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #00ff41;
+            box-shadow: 0 0 6px #00ff41;
+            margin: 1.8rem 0;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.8em;
+            letter-spacing: 0.15em;
+            color: #ffe600;
+            text-shadow: 0 0 6px #ffe600, 0 0 12px #cc9900;
+            margin-bottom: 0.4rem;
+            text-align: left;
+        }
+
+        .field-label::before {
+            content: '> ';
+        }
+
+        textarea, input[type="file"] {
+            width: 100%;
+            background: #0a0a00;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: 0.95em;
+            padding: 0.7rem 0.85rem;
+            box-shadow: 0 0 6px #00ff41 inset, 0 0 10px #00aa2a;
+            outline: none;
+            resize: vertical;
+            box-sizing: border-box;
+            text-shadow: 0 0 4px #00ff41;
+        }
+
+        textarea {
+            min-height: 120px;
+            line-height: 1.7;
+        }
+
+        textarea:focus, input[type="file"]:focus {
+            box-shadow: 0 0 10px #00ff41 inset, 0 0 20px #00aa2a;
+        }
+
+        textarea::placeholder {
+            color: #005510;
+        }
+
+        input[type="file"] {
+            cursor: pointer;
+            padding: 0.5rem 0.85rem;
+        }
+
+        input[type="file"]::-webkit-file-upload-button {
+            background: #0a0a00;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85em;
+            padding: 0.3rem 0.8rem;
+            cursor: pointer;
+            margin-right: 0.75rem;
+            text-shadow: 0 0 4px #00ff41;
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 0.72em;
+            color: #005510;
+            margin-top: 0.25rem;
+            letter-spacing: 0.1em;
+        }
+
+        .char-count.warn { color: #ffe600; text-shadow: 0 0 6px #ffe600; }
+        .char-count.over { color: #ff3333; text-shadow: 0 0 6px #ff3333; }
+
+        .field-group {
+            margin-bottom: 1.4rem;
+            text-align: left;
+        }
+
+        .transmit-btn {
+            display: block;
+            width: 100%;
+            margin-top: 1.6rem;
+            padding: 0.75rem;
+            background: transparent;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: 1em;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 0 8px #00ff41, inset 0 0 8px rgba(0,255,65,0.08);
+            text-shadow: 0 0 6px #00ff41, 0 0 14px #00aa2a;
+            transition: all 0.2s;
+        }
+
+        .transmit-btn:hover:not(:disabled) {
+            background: rgba(0,255,65,0.08);
+            box-shadow: 0 0 18px #00ff41, inset 0 0 14px rgba(0,255,65,0.15);
+        }
+
+        .transmit-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        #status-box {
+            min-height: 2.5rem;
+            margin-top: 1.2rem;
+            font-size: 0.88em;
+            letter-spacing: 0.08em;
+            text-align: center;
+        }
+
+        .status-ok {
+            color: #00ff41;
+            text-shadow: 0 0 8px #00ff41, 0 0 20px #00aa2a;
+            animation: flicker 4s infinite;
+        }
+
+        .status-err {
+            color: #ff3333;
+            text-shadow: 0 0 8px #ff3333;
+        }
+
+        .status-sending {
+            color: #ffe600;
+            text-shadow: 0 0 6px #ffe600, 0 0 12px #cc9900;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .blink { animation: blink 0.8s step-end infinite; }
+    </style>
+</head>
+<body>
+<nav class="breadcrumb">
+    <a href="index.html">Home</a> &rsaquo;
+    <a href="MJ.html">Michael Jackson/</a>
+    <a href="book.html">Read the Zine/</a>
+    <a href="tv.html">Brayden TV/</a>
+    <a href="oracle.html">Supply the Oracle</a>
+</nav>
+
+<div class="oracle-wrap">
+
+    <h1>Supply the Oracle</h1>
+
+    <p class="oracle-lore">
+        Somewhere in Spanish Fork, Utah<br>
+        there is a thermal printer.<br>
+        You may send it a message, an image,<br>
+        or both — and your transmission will<br>
+        materialize in physical form.
+    </p>
+
+    <hr class="divider">
+
+    <form id="oracle-form" enctype="multipart/form-data">
+
+        <div class="field-group">
+            <label class="field-label" for="msg">YOUR MESSAGE</label>
+            <textarea id="msg" name="text" maxlength="500"
+                placeholder="Write something..."></textarea>
+            <div class="char-count" id="char-count">0 / 500</div>
+        </div>
+
+        <div class="field-group">
+            <label class="field-label" for="img">IMAGE ATTACHMENT <span style="color:#005510">(optional)</span></label>
+            <input type="file" id="img" name="image" accept="image/*">
+        </div>
+
+        <button class="transmit-btn" type="submit" id="submit-btn">
+            [ TRANSMIT ]
+        </button>
+
+        <div id="status-box"></div>
+
+    </form>
+
+    <hr class="divider">
+
+</div>
+
+<footer>
+    <p>Visit my Ole Pal Jake's Site.</p>
+    <a href="https://jakewel.ch"><img src="Assets/Images/88x31.gif" alt="jakewel.ch"></a>
+</footer>
+
+<script>
+    const textarea = document.getElementById('msg');
+    const charCount = document.getElementById('char-count');
+    const form = document.getElementById('oracle-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const statusBox = document.getElementById('status-box');
+
+    textarea.addEventListener('input', () => {
+        const len = textarea.value.length;
+        charCount.textContent = `${len} / 500`;
+        charCount.className = 'char-count' + (len > 450 ? ' over' : len > 380 ? ' warn' : '');
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const text = textarea.value.trim();
+        const imageFile = document.getElementById('img').files[0];
+
+        if (!text && !imageFile) {
+            setStatus('err', 'Nothing to transmit — add a message or image.');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        setStatus('sending', 'TRANSMITTING<span class="blink">_</span>');
+
+        const data = new FormData();
+        if (text) data.append('text', text);
+        if (imageFile) data.append('image', imageFile);
+
+        try {
+            const res = await fetch('https://printer.braydenrichards.com/api/oracle', {
+                method: 'POST',
+                body: data,
+            });
+            const json = await res.json();
+
+            if (json.ok) {
+                setStatus('ok', 'TRANSMISSION RECEIVED. IT WILL MATERIALIZE SHORTLY.');
+                form.reset();
+                charCount.textContent = '0 / 500';
+                charCount.className = 'char-count';
+                setTimeout(() => { submitBtn.disabled = false; }, 5000);
+            } else {
+                setStatus('err', json.error || 'Transmission failed.');
+                submitBtn.disabled = false;
+            }
+        } catch {
+            setStatus('err', 'Could not reach the oracle. Check your connection.');
+            submitBtn.disabled = false;
+        }
+    });
+
+    function setStatus(type, html) {
+        statusBox.innerHTML = html;
+        statusBox.className = '';
+        if (type === 'ok')      statusBox.classList.add('status-ok');
+        if (type === 'err')     statusBox.classList.add('status-err');
+        if (type === 'sending') statusBox.classList.add('status-sending');
+    }
+</script>
+</body>
+</html>
