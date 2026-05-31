@@ -157,6 +157,52 @@
         }
 
         .blink { animation: blink 0.8s step-end infinite; }
+
+        .mode-toggle {
+            display: flex;
+            gap: 0;
+            margin-top: .2rem;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: .5rem;
+            background: transparent;
+            border: 1px solid #00ff41;
+            color: #005510;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: .82em;
+            letter-spacing: .15em;
+            cursor: pointer;
+            text-shadow: none;
+            box-shadow: none;
+            transition: all 0.15s;
+        }
+
+        .mode-btn + .mode-btn { border-left: none; }
+
+        .mode-btn.active {
+            background: rgba(0, 255, 65, 0.1);
+            color: #00ff41;
+            text-shadow: 0 0 6px #00ff41;
+            box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.12);
+        }
+
+        .ruler {
+            font-size: .7em;
+            color: #003a0f;
+            text-shadow: none;
+            letter-spacing: 0;
+            overflow: hidden;
+            white-space: pre;
+            margin-bottom: .3rem;
+            text-align: left;
+        }
+
+        textarea.ascii-mode {
+            white-space: pre;
+            overflow-x: scroll;
+        }
     </style>
 </head>
 <body>
@@ -184,8 +230,18 @@
     <form id="oracle-form" enctype="multipart/form-data">
 
         <div class="field-group">
-            <label class="field-label" for="msg">YOUR MESSAGE</label>
-            <textarea id="msg" name="text" maxlength="500"
+            <label class="field-label">TRANSMISSION MODE</label>
+            <div class="mode-toggle">
+                <button type="button" class="mode-btn active" data-mode="message">[ MESSAGE ]</button>
+                <button type="button" class="mode-btn" data-mode="ascii">[ ASCII ART ]</button>
+            </div>
+            <input type="hidden" name="mode" id="mode-input" value="message">
+        </div>
+
+        <div class="field-group">
+            <label class="field-label" id="msg-label" for="msg">YOUR MESSAGE</label>
+            <div class="ruler" id="ruler" style="display:none">|    5|   10|   15|   20|   25|   30|   35|   40|   45|   50| 56|</div>
+            <textarea id="msg" name="text" maxlength="2000"
                 placeholder="Write something..."></textarea>
             <div class="char-count" id="char-count">0 / 500</div>
         </div>
@@ -218,12 +274,47 @@
     const form = document.getElementById('oracle-form');
     const submitBtn = document.getElementById('submit-btn');
     const statusBox = document.getElementById('status-box');
+    const modeInput = document.getElementById('mode-input');
+    const ruler = document.getElementById('ruler');
+    const msgLabel = document.getElementById('msg-label');
 
-    textarea.addEventListener('input', () => {
-        const len = textarea.value.length;
-        charCount.textContent = `${len} / 500`;
-        charCount.className = 'char-count' + (len > 450 ? ' over' : len > 380 ? ' warn' : '');
+    const LIMITS = { message: 500, ascii: 2000 };
+
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const mode = btn.dataset.mode;
+            modeInput.value = mode;
+
+            if (mode === 'ascii') {
+                textarea.setAttribute('wrap', 'off');
+                textarea.classList.add('ascii-mode');
+                textarea.setAttribute('maxlength', '2000');
+                textarea.placeholder = 'Draw or paste your ASCII art here...\nEach line is printed exactly as typed.';
+                ruler.style.display = 'block';
+                msgLabel.textContent = 'YOUR ASCII ART';
+            } else {
+                textarea.setAttribute('wrap', 'soft');
+                textarea.classList.remove('ascii-mode');
+                textarea.setAttribute('maxlength', '500');
+                textarea.placeholder = 'Write something...';
+                ruler.style.display = 'none';
+                msgLabel.textContent = 'YOUR MESSAGE';
+            }
+            updateCount();
+        });
     });
+
+    function updateCount() {
+        const mode = modeInput.value;
+        const limit = LIMITS[mode];
+        const len = textarea.value.length;
+        charCount.textContent = `${len} / ${limit}`;
+        charCount.className = 'char-count' + (len > limit * 0.9 ? ' over' : len > limit * 0.75 ? ' warn' : '');
+    }
+
+    textarea.addEventListener('input', updateCount);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
