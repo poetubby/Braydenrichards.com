@@ -453,6 +453,72 @@
         .wx-day-hi   { color: #ffe600; }
         .wx-day-lo   { color: #7ec8e3; }
 
+        #wx-panel-outer {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-left: 1px solid #0a3a5a;
+        }
+
+        .wx-panel-title {
+            background: #002050;
+            border-bottom: 1px solid #ffe600;
+            color: #ffe600;
+            font-size: clamp(0.35em, 0.95vw, 0.62em);
+            letter-spacing: 0.25em;
+            padding: 1.5% 3%;
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        #wx-panel-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* 5-day forecast inside panel */
+        #wx-panel-body .wx-forecast {
+            flex: 1;
+            display: flex;
+            align-items: stretch;
+        }
+
+        /* Stats grid for conditions / atmospheric panels */
+        .wx-stats-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-content: center;
+        }
+
+        .wx-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4% 2%;
+            border-right: 1px solid #0a3a5a;
+            border-bottom: 1px solid #0a3a5a;
+        }
+
+        .wx-stat:nth-child(even)       { border-right: none; }
+        .wx-stat:nth-last-child(-n+2)  { border-bottom: none; }
+
+        .wx-stat-label {
+            font-size: clamp(0.32em, 0.85vw, 0.55em);
+            color: #6a9aaa;
+            letter-spacing: 0.15em;
+            margin-bottom: 6%;
+        }
+
+        .wx-stat-value {
+            font-size: clamp(0.5em, 1.4vw, 0.95em);
+            color: #ffe600;
+            letter-spacing: 0.1em;
+        }
+
         .wx-ticker-wrap {
             background: #001a50;
             border-top: 2px solid #ffe600;
@@ -535,7 +601,10 @@
                             <div class="wx-condition" id="wx-condition">—</div>
                             <div class="wx-detail" id="wx-detail">—</div>
                         </div>
-                        <div class="wx-forecast" id="wx-forecast-row"></div>
+                        <div id="wx-panel-outer">
+                            <div id="wx-panel-title" class="wx-panel-title">5-DAY FORECAST</div>
+                            <div id="wx-panel-body"></div>
+                        </div>
                     </div>
                     <div class="wx-ticker-wrap">
                         <div class="wx-ticker" id="wx-ticker">EXTENDED FORECAST &middot; LIVE WEATHER &middot; BRAYDEN TV &middot; EXTENDED FORECAST &middot; LIVE WEATHER &middot; BRAYDEN TV &middot; EXTENDED FORECAST &middot; LIVE WEATHER &middot; BRAYDEN TV</div>
@@ -743,8 +812,10 @@
         }
 
         function toggleAudio() {
-            video.muted = !video.muted;
-            document.getElementById('audio-hint').textContent = video.muted
+            const muting = !video.muted;
+            video.muted  = muting;
+            if (wxAudio) wxAudio.muted = muting;
+            document.getElementById('audio-hint').textContent = muting
                 ? '[ Click for Audio ]'
                 : '[ Click to Mute ]';
         }
@@ -825,8 +896,11 @@
 
         let wxClockInterval   = null;
         let wxRefreshInterval = null;
+        let wxPanelInterval   = null;
         let wxLastMusicIdx    = -1;
         let wxMode            = false;
+        let wxCurrentData     = null;
+        let wxPanelIndex      = 0;
 
         function enterWeatherMode() {
             video.pause();
@@ -853,8 +927,10 @@
         function exitWeatherMode() {
             clearInterval(wxClockInterval);
             clearInterval(wxRefreshInterval);
-            wxClockInterval = wxRefreshInterval = null;
-            wxMode = false;
+            clearInterval(wxPanelInterval);
+            wxClockInterval = wxRefreshInterval = wxPanelInterval = null;
+            wxCurrentData   = null;
+            wxMode          = false;
 
             wxAudio.pause();
             wxAudio.src = '';
@@ -913,9 +989,10 @@
         async function loadWeatherData(lat, lon, city) {
             try {
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-                    `&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m,apparent_temperature` +
-                    `&daily=temperature_2m_max,temperature_2m_min,weathercode` +
-                    `&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=auto&forecast_days=6`;
+                    `&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m,apparent_temperature,` +
+                    `dewpoint_2m,pressure_msl,windgusts_10m,winddirection_10m,cloudcover,precipitation,visibility,uv_index` +
+                    `&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_sum,precipitation_probability_max` +
+                    `&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=6`;
                 const res  = await fetch(url);
                 const data = await res.json();
                 renderWeatherDisplay(data, city);
@@ -928,9 +1005,96 @@
             }
         }
 
+        function degToCard(deg) {
+            const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+            return dirs[Math.round(deg / 22.5) % 16];
+        }
+
+        function mToMi(m)    { return (m / 1609.34).toFixed(1) + ' MI'; }
+        function hpaToInHg(h){ return (h * 0.02953).toFixed(2) + ' inHg'; }
+
+        function stat(label, value) {
+            return `<div class="wx-stat"><div class="wx-stat-label">${label}</div><div class="wx-stat-value">${value}</div></div>`;
+        }
+
+        const WX_PANELS = [
+            {
+                title: '5-DAY FORECAST',
+                render(data) {
+                    const days  = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+                    const daily = data.daily;
+                    let html = '<div class="wx-forecast">';
+                    for (let i = 1; i <= 5; i++) {
+                        const d     = new Date(daily.time[i] + 'T12:00:00');
+                        const [ico] = wmoInfo(daily.weathercode[i]);
+                        html += `<div class="wx-day">
+                            <div class="wx-day-name">${days[d.getDay()]}</div>
+                            <div class="wx-day-icon">${ico}</div>
+                            <div class="wx-day-hi">${Math.round(daily.temperature_2m_max[i])}°</div>
+                            <div class="wx-day-lo">${Math.round(daily.temperature_2m_min[i])}°</div>
+                        </div>`;
+                    }
+                    return html + '</div>';
+                }
+            },
+            {
+                title: 'WIND & CLOUDS',
+                render(data) {
+                    const c = data.current;
+                    return '<div class="wx-stats-grid">' +
+                        stat('WIND SPEED',  Math.round(c.windspeed_10m)  + ' MPH') +
+                        stat('DIRECTION',   degToCard(c.winddirection_10m)) +
+                        stat('WIND GUSTS',  Math.round(c.windgusts_10m)  + ' MPH') +
+                        stat('CLOUD COVER', c.cloudcover + '%') +
+                        stat('DEW POINT',   Math.round(c.dewpoint_2m)    + '°F') +
+                        stat('FEELS LIKE',  Math.round(c.apparent_temperature) + '°F') +
+                    '</div>';
+                }
+            },
+            {
+                title: 'ATMOSPHERIC DATA',
+                render(data) {
+                    const c = data.current;
+                    const visMi = c.visibility != null ? mToMi(c.visibility) : 'N/A';
+                    const uv    = c.uv_index   != null ? c.uv_index.toFixed(1) : 'N/A';
+                    const prec  = c.precipitation != null ? (c.precipitation > 0 ? c.precipitation.toFixed(2) + ' IN' : 'NONE') : 'N/A';
+                    return '<div class="wx-stats-grid">' +
+                        stat('HUMIDITY',    c.relativehumidity_2m + '%') +
+                        stat('DEW POINT',   Math.round(c.dewpoint_2m) + '°F') +
+                        stat('PRESSURE',    hpaToInHg(c.pressure_msl)) +
+                        stat('VISIBILITY',  visMi) +
+                        stat('UV INDEX',    uv) +
+                        stat('PRECIP',      prec) +
+                    '</div>';
+                }
+            },
+            {
+                title: 'EXTENDED OUTLOOK',
+                render(data) {
+                    const days  = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+                    const daily = data.daily;
+                    let html = '<div class="wx-forecast">';
+                    for (let i = 1; i <= 5; i++) {
+                        const d    = new Date(daily.time[i] + 'T12:00:00');
+                        const pct  = daily.precipitation_probability_max[i] ?? '—';
+                        const prec = daily.precipitation_sum[i] != null
+                            ? (daily.precipitation_sum[i] > 0 ? daily.precipitation_sum[i].toFixed(2) + '"' : '0"')
+                            : '—';
+                        html += `<div class="wx-day">
+                            <div class="wx-day-name">${days[d.getDay()]}</div>
+                            <div class="wx-day-icon" style="font-size:1.2em">💧${pct}%</div>
+                            <div class="wx-day-hi">${prec}</div>
+                            <div class="wx-day-lo" style="color:#a8d8ea">RAIN</div>
+                        </div>`;
+                    }
+                    return html + '</div>';
+                }
+            },
+        ];
+
         function renderWeatherDisplay(data, city) {
-            const cur  = data.current;
-            const daily = data.daily;
+            wxCurrentData = data;
+            const cur   = data.current;
             const [icon, label] = wmoInfo(cur.weathercode);
 
             document.getElementById('wx-city').textContent      = city;
@@ -940,25 +1104,24 @@
             document.getElementById('wx-detail').textContent    =
                 `WIND: ${Math.round(cur.windspeed_10m)} MPH\nHUMIDITY: ${cur.relativehumidity_2m}%\nFEELS LIKE: ${Math.round(cur.apparent_temperature)}°F`;
 
-            const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-            const row  = document.getElementById('wx-forecast-row');
-            row.innerHTML = '';
-            for (let i = 1; i <= 5; i++) {
-                const date    = new Date(daily.time[i] + 'T12:00:00');
-                const dayName = days[date.getDay()];
-                const [dIcon] = wmoInfo(daily.weathercode[i]);
-                const hi      = Math.round(daily.temperature_2m_max[i]);
-                const lo      = Math.round(daily.temperature_2m_min[i]);
-                row.innerHTML += `<div class="wx-day">
-                    <div class="wx-day-name">${dayName}</div>
-                    <div class="wx-day-icon">${dIcon}</div>
-                    <div class="wx-day-hi">${hi}°</div>
-                    <div class="wx-day-lo">${lo}°</div>
-                </div>`;
-            }
+            wxPanelIndex = 0;
+            showWxPanel(0);
 
             document.getElementById('wx-picker').style.display  = 'none';
             document.getElementById('wx-display').style.display = 'flex';
+
+            clearInterval(wxPanelInterval);
+            wxPanelInterval = setInterval(() => {
+                wxPanelIndex = (wxPanelIndex + 1) % WX_PANELS.length;
+                showWxPanel(wxPanelIndex);
+            }, 9000);
+        }
+
+        function showWxPanel(idx) {
+            if (!wxCurrentData) return;
+            const panel = WX_PANELS[idx];
+            document.getElementById('wx-panel-title').textContent = panel.title;
+            document.getElementById('wx-panel-body').innerHTML    = panel.render(wxCurrentData);
         }
 
         function startWxClock() {
