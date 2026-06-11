@@ -1163,7 +1163,7 @@
             while (wxMode) {
                 try {
                     const rss = encodeURIComponent('https://feeds.bbci.co.uk/news/rss.xml');
-                    const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rss}&count=12`);
+                    const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rss}`);
                     const data = await res.json();
                     if (!data.items || !data.items.length) throw new Error();
                     const line = data.items.map(i => i.title).join('  ·  ');
