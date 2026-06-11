@@ -246,12 +246,9 @@
 
         #yt-frame {
             display: none;
-            position: absolute;
-            inset: 0;
             width: 100%;
-            height: 100%;
+            aspect-ratio: 16 / 9;
             border: none;
-            z-index: 2;
         }
     </style>
 </head>
@@ -503,7 +500,7 @@
         function enterKnicksMode() {
             video.pause();
             video.style.display = 'none';
-            ytFrame.src = `https://www.youtube.com/embed/?listType=playlist&list=${KNICKS_PLAYLIST}&autoplay=1&rel=0`;
+            ytFrame.src = `https://www.youtube.com/embed/?listType=playlist&list=${KNICKS_PLAYLIST}&autoplay=1&rel=0&controls=0&modestbranding=1&iv_load_policy=3`;
             ytFrame.style.display = 'block';
             btnKnicks.classList.add('active');
             btnMain.textContent  = '← Back to TV';

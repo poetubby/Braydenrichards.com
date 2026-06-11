@@ -7,13 +7,14 @@
     <link rel="stylesheet" href="style.css">
     <style>
         #score-widget {
-            margin: 24px 0;
+            margin: 24px auto;
             border: 1px solid #f58426;
             padding: 16px 20px;
             max-width: 480px;
             font-family: 'Share Tech Mono', 'Courier New', monospace;
             font-size: 0.9em;
             color: #f58426;
+            text-align: center;
         }
         #score-widget .widget-title {
             letter-spacing: 0.2em;
@@ -91,7 +92,8 @@ We stay balling.
             const res = await fetch('https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json');
             const data = await res.json();
             const game = data.scoreboard.games.find(g =>
-                g.homeTeam.teamId === KNICKS_ID || g.awayTeam.teamId === KNICKS_ID
+                // eslint-disable-next-line eqeqeq
+                g.homeTeam.teamId == KNICKS_ID || g.awayTeam.teamId == KNICKS_ID
             );
 
             if (!game) {
