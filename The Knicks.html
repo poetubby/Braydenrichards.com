@@ -4,12 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Knicks </title>
-    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #score-widget {
+            margin: 24px 0;
+            border: 1px solid #f58426;
+            padding: 16px 20px;
+            max-width: 480px;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #f58426;
+        }
+        #score-widget .widget-title {
+            letter-spacing: 0.2em;
+            font-size: 0.75em;
+            color: #a85010;
+            margin-bottom: 10px;
+        }
+        #score-widget .score-line {
+            font-size: 1.5em;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+        }
+        #score-widget .score-status {
+            font-size: 0.8em;
+            letter-spacing: 0.15em;
+        }
+        #score-widget .pbp-list {
+            margin-top: 12px;
+            border-top: 1px solid #a85010;
+            padding-top: 10px;
+            font-size: 0.78em;
+            letter-spacing: 0.05em;
+            line-height: 1.8;
+            color: #d06818;
+        }
+        #score-widget .live-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            background: #f58426;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: kpulse 1.2s ease-in-out infinite;
+        }
+        @keyframes kpulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.15; }
+        }
+    </style>
 </head>
 
 <body>
 <nav class="breadcrumb">
-    <a href="index.html">Home</a> &rsaquo; Michael Jackson
+    <a href="index.html">Home</a> &rsaquo; The Knicks
 </nav>
  <h1> "The biggest hiest that NY has ever seen"</h1>
 <img src="Assets/Images/Brunson Aura (1).png" class="hero-image" alt="Brunsonn">
@@ -21,10 +69,82 @@ The Referees did not call the foul and when reviewed the following day, decided 
 In Game 4 A scuffle including Wembanyama and Mitchell Robinson. Following the leagues ruling on Wembanyama's previous no call, He would be absolved but he was handed a flagrant. Outside of a clear and blantant turnover on Wemby as well the Knicks have been 
 falling deeply. This isnt new to New York. They have had a bad night of shooting. 
 
-We stay balling. 
+We stay balling.
+
+<div id="score-widget">
+    <div class="widget-title">[ KNICKS LIVE SCORE ]</div>
+    <div id="score-body">Checking for a game today...</div>
+</div>
+
+<br><br>
 
     <p>Visit my Ole Pal Jake's Site.</p>
     <a href="https://jakewel.ch"><img src="Assets/Images/88x31.gif" alt="jakewel.ch"></a>
 </footer>
+
+<script>
+    const KNICKS_ID = 1610612752;
+
+    async function fetchScore() {
+        const el = document.getElementById('score-body');
+        try {
+            const res = await fetch('https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json');
+            const data = await res.json();
+            const game = data.scoreboard.games.find(g =>
+                g.homeTeam.teamId === KNICKS_ID || g.awayTeam.teamId === KNICKS_ID
+            );
+
+            if (!game) {
+                el.innerHTML = '<span class="score-status">No game scheduled today.</span>';
+                return;
+            }
+
+            const home = game.homeTeam;
+            const away = game.awayTeam;
+            const statusText = game.gameStatusText;
+            const isLive = game.gameStatus === 2;
+            const isFinal = game.gameStatus === 3;
+
+            const dotHtml = isLive ? '<span class="live-dot"></span>' : '';
+            el.innerHTML = `
+                <div class="score-line">${away.teamTricode} ${away.score} &mdash; ${home.score} ${home.teamTricode}</div>
+                <div class="score-status">${dotHtml}${statusText}</div>
+            `;
+
+            if (isLive) {
+                await fetchPlayByPlay(game.gameId, home.teamTricode, away.teamTricode);
+            }
+        } catch (e) {
+            el.innerHTML = '<span class="score-status">Score unavailable.</span>';
+        }
+    }
+
+    async function fetchPlayByPlay(gameId, homeCode, awayCode) {
+        try {
+            const res = await fetch(`https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_${gameId}.json`);
+            const data = await res.json();
+            const actions = data.game.actions;
+            const recent = actions.slice(-6).reverse();
+
+            const lines = recent.map(a => {
+                const team = a.teamTricode || '—';
+                return `${a.clock || ''} ${team}: ${a.description}`;
+            }).join('<br>');
+
+            const existing = document.getElementById('score-body');
+            const pbpDiv = document.getElementById('pbp-section') || (() => {
+                const d = document.createElement('div');
+                d.id = 'pbp-section';
+                d.className = 'pbp-list';
+                existing.parentNode.appendChild(d);
+                return d;
+            })();
+            pbpDiv.innerHTML = lines;
+        } catch (e) { /* pbp unavailable */ }
+    }
+
+    fetchScore();
+    setInterval(fetchScore, 30000);
+</script>
 </body>
 </html>

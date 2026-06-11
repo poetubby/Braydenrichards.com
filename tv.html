@@ -220,6 +220,38 @@
         .btn-row {
             display: flex;
             gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-knicks {
+            background: transparent;
+            border: 1px solid #f58426;
+            color: #f58426;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: 0.85em;
+            padding: 8px 22px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-shadow: 0 0 6px #f58426;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .btn-knicks:hover, .btn-knicks.active {
+            background: #f58426;
+            color: #0a0a00;
+            text-shadow: none;
+        }
+
+        #yt-frame {
+            display: none;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 2;
         }
     </style>
 </head>
@@ -250,11 +282,17 @@
 
         <div class="tv-screen">
             <video id="tv-video" muted playsinline></video>
+            <iframe id="yt-frame"
+                src=""
+                allow="autoplay; encrypted-media; fullscreen"
+                allowfullscreen>
+            </iframe>
         </div>
 
         <p class="click-audio" id="audio-hint" onclick="toggleAudio()">[ Click for Audio ]</p>
         <div class="btn-row">
-            <button class="btn-channel" onclick="changeChannel()">Change Channel</button>
+            <button class="btn-channel" id="btn-main" onclick="exitKnicksMode()">Change Channel</button>
+            <button class="btn-knicks" id="btn-knicks" onclick="enterKnicksMode()">Knicks Ch.</button>
             <button class="btn-channel" onclick="toggleFullscreen()">Full Screen</button>
         </div>
         <p class="tv-footer-info" id="tv-status">[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]</p>
@@ -455,6 +493,40 @@
         }
 
         init();
+
+        const ytFrame    = document.getElementById('yt-frame');
+        const btnKnicks  = document.getElementById('btn-knicks');
+        const btnMain    = document.getElementById('btn-main');
+        // Classic Knicks Games playlist (verified via YouTube search)
+        const KNICKS_PLAYLIST = 'PLicsvblzBrmzSYJXH1D_iAuqdn7tT28r0';
+
+        function enterKnicksMode() {
+            video.pause();
+            video.style.display = 'none';
+            ytFrame.src = `https://www.youtube.com/embed/?listType=playlist&list=${KNICKS_PLAYLIST}&autoplay=1&rel=0`;
+            ytFrame.style.display = 'block';
+            btnKnicks.classList.add('active');
+            btnMain.textContent  = '← Back to TV';
+            document.getElementById('channel-id').textContent = 'KNICKS CH.';
+            document.getElementById('channel-id').style.color = '#f58426';
+            document.getElementById('channel-id').style.textShadow = '0 0 6px #f58426';
+            status.textContent   = '[ KNICKS CLASSICS — PLAYING ]';
+        }
+
+        function exitKnicksMode() {
+            if (ytFrame.style.display === 'block') {
+                ytFrame.style.display = 'none';
+                ytFrame.src = '';
+                video.style.display  = 'block';
+                btnKnicks.classList.remove('active');
+                btnMain.textContent  = 'Change Channel';
+                document.getElementById('channel-id').style.color = '';
+                document.getElementById('channel-id').style.textShadow = '';
+                changeChannel();
+            } else {
+                changeChannel();
+            }
+        }
     </script>
 </body>
 </html>
