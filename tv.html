@@ -1160,18 +1160,22 @@
 
         async function fetchAndSetHeadlines() {
             const ticker = document.getElementById('wx-ticker');
-            try {
-                const rss = encodeURIComponent('https://feeds.bbci.co.uk/news/rss.xml');
-                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rss}&count=12`);
-                const data = await res.json();
-                if (!data.items || !data.items.length) throw new Error();
-                const line = data.items.map(i => i.title).join('  ·  ');
-                ticker.textContent = line + '  ·  ' + line;
-                ticker.style.animation = 'none';
-                void ticker.offsetWidth;
-                ticker.style.animation = '';
-            } catch (e) {
-                ticker.textContent = 'NEWS UNAVAILABLE  ·  EXTENDED FORECAST  ·  LIVE WEATHER  ·  BRAYDEN TV';
+            while (wxMode) {
+                try {
+                    const rss = encodeURIComponent('https://feeds.bbci.co.uk/news/rss.xml');
+                    const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rss}&count=12`);
+                    const data = await res.json();
+                    if (!data.items || !data.items.length) throw new Error();
+                    const line = data.items.map(i => i.title).join('  ·  ');
+                    ticker.textContent = line + '  ·  ' + line;
+                    ticker.style.animation = 'none';
+                    void ticker.offsetWidth;
+                    ticker.style.animation = '';
+                    return;
+                } catch (e) {
+                    ticker.textContent = 'ACQUIRING FEED  ·  PLEASE STAND BY  ·';
+                    await new Promise(r => setTimeout(r, 5000));
+                }
             }
         }
 
