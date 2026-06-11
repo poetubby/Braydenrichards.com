@@ -876,6 +876,10 @@
             'Aangell%20-%20Serendipity.mp3',
             'Aangell%20-%20Thumper.mp3',
         ];
+        for (let i = WX_MUSIC.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [WX_MUSIC[i], WX_MUSIC[j]] = [WX_MUSIC[j], WX_MUSIC[i]];
+        }
 
         const WMO = {
             0:  ['☀️',  'CLEAR'],           1:  ['🌤️', 'MOSTLY CLEAR'],
