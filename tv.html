@@ -250,6 +250,232 @@
             aspect-ratio: 16 / 9;
             border: none;
         }
+
+        .btn-weather {
+            background: transparent;
+            border: 1px solid #7ec8e3;
+            color: #7ec8e3;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: 0.85em;
+            padding: 8px 22px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-shadow: 0 0 6px #7ec8e3;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .btn-weather:hover, .btn-weather.active {
+            background: #7ec8e3;
+            color: #0a0a00;
+            text-shadow: none;
+        }
+
+        /* ── Weather Channel Screen ── */
+        #weather-screen {
+            display: none;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(180deg, #001233 0%, #003366 55%, #001a33 100%);
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        #wx-picker {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3%;
+            z-index: 2;
+        }
+
+        .wx-picker-title {
+            font-size: clamp(0.7em, 2vw, 1.3em);
+            letter-spacing: 0.3em;
+            color: #ffe600;
+            text-shadow: 0 0 10px #ffe600;
+        }
+
+        .wx-picker-form {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        #wx-zip {
+            background: transparent;
+            border: 1px solid #7ec8e3;
+            color: #7ec8e3;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: clamp(0.6em, 1.5vw, 1em);
+            padding: 6px 12px;
+            letter-spacing: 0.2em;
+            text-align: center;
+            outline: none;
+            width: 100px;
+        }
+
+        #wx-zip::placeholder { color: #2a5a6a; }
+
+        .wx-btn {
+            background: transparent;
+            border: 1px solid #7ec8e3;
+            color: #7ec8e3;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: clamp(0.6em, 1.5vw, 1em);
+            padding: 6px 14px;
+            cursor: pointer;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .wx-btn:hover { background: #7ec8e3; color: #0a0a00; }
+
+        .wx-btn-loc { border-color: #ffe600; color: #ffe600; }
+        .wx-btn-loc:hover { background: #ffe600; color: #0a0a00; }
+
+        .wx-picker-or {
+            font-size: clamp(0.5em, 1.2vw, 0.8em);
+            color: #3a6a7a;
+            letter-spacing: 0.2em;
+        }
+
+        #wx-picker-error {
+            font-size: clamp(0.45em, 1.1vw, 0.72em);
+            color: #ff6644;
+            letter-spacing: 0.1em;
+            min-height: 1.2em;
+        }
+
+        #wx-display {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+        }
+
+        .wx-top-bar {
+            background: #001a50;
+            border-bottom: 2px solid #ffe600;
+            color: #ffe600;
+            text-shadow: 0 0 8px #ffe600;
+            text-align: center;
+            letter-spacing: 0.3em;
+            font-size: clamp(0.5em, 1.8vw, 1.1em);
+            padding: 1.5% 0;
+            flex-shrink: 0;
+        }
+
+        .wx-location-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1% 3%;
+            font-size: clamp(0.45em, 1.4vw, 0.9em);
+            letter-spacing: 0.15em;
+            color: #a8d8ea;
+            border-bottom: 1px solid #0a3a5a;
+            flex-shrink: 0;
+        }
+
+        .wx-main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .wx-current {
+            flex: 1.1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2%;
+            border-right: 1px solid #0a3a5a;
+        }
+
+        .wx-icon { font-size: clamp(1.2em, 4vw, 3em); line-height: 1; }
+
+        .wx-temp {
+            font-size: clamp(1.2em, 5vw, 3.5em);
+            color: #ffe600;
+            text-shadow: 0 0 12px #ffe600;
+            letter-spacing: 0.05em;
+            line-height: 1.1;
+        }
+
+        .wx-condition {
+            font-size: clamp(0.45em, 1.4vw, 0.85em);
+            letter-spacing: 0.2em;
+            color: #a8d8ea;
+            margin-top: 2%;
+        }
+
+        .wx-detail {
+            font-size: clamp(0.38em, 1vw, 0.65em);
+            letter-spacing: 0.08em;
+            color: #6a9aaa;
+            margin-top: 3%;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .wx-forecast {
+            flex: 2;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .wx-day {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2% 1%;
+            border-right: 1px solid #0a3a5a;
+            font-size: clamp(0.38em, 1vw, 0.68em);
+            letter-spacing: 0.08em;
+            text-align: center;
+            gap: 6%;
+        }
+
+        .wx-day:last-child { border-right: none; }
+        .wx-day-name { color: #a8d8ea; letter-spacing: 0.12em; }
+        .wx-day-icon { font-size: 1.9em; }
+        .wx-day-hi   { color: #ffe600; }
+        .wx-day-lo   { color: #7ec8e3; }
+
+        .wx-ticker-wrap {
+            background: #001a50;
+            border-top: 2px solid #ffe600;
+            overflow: hidden;
+            height: 10%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .wx-ticker {
+            white-space: nowrap;
+            font-size: clamp(0.38em, 1.1vw, 0.72em);
+            letter-spacing: 0.15em;
+            color: #ffe600;
+            animation: wx-scroll 35s linear infinite;
+            padding-left: 100%;
+        }
+
+        @keyframes wx-scroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-100%); }
+        }
     </style>
 </head>
 <body>
@@ -284,14 +510,48 @@
                 allow="autoplay; encrypted-media; fullscreen"
                 allowfullscreen>
             </iframe>
+            <div id="weather-screen">
+                <div id="wx-picker">
+                    <div class="wx-picker-title">YOUR LOCAL FORECAST</div>
+                    <div class="wx-picker-form">
+                        <input id="wx-zip" type="text" placeholder="ZIP CODE" maxlength="5"
+                            onkeydown="if(event.key==='Enter')submitZip()">
+                        <button class="wx-btn" onclick="submitZip()">[ GO ]</button>
+                    </div>
+                    <div class="wx-picker-or">— or —</div>
+                    <button class="wx-btn wx-btn-loc" onclick="useMyLocation()">[ USE MY LOCATION ]</button>
+                    <div id="wx-picker-error"></div>
+                </div>
+                <div id="wx-display">
+                    <div class="wx-top-bar">YOUR LOCAL FORECAST</div>
+                    <div class="wx-location-row">
+                        <span id="wx-city">—</span>
+                        <span id="wx-clock">—</span>
+                    </div>
+                    <div class="wx-main">
+                        <div class="wx-current">
+                            <div class="wx-icon" id="wx-icon">—</div>
+                            <div class="wx-temp" id="wx-temp">—</div>
+                            <div class="wx-condition" id="wx-condition">—</div>
+                            <div class="wx-detail" id="wx-detail">—</div>
+                        </div>
+                        <div class="wx-forecast" id="wx-forecast-row"></div>
+                    </div>
+                    <div class="wx-ticker-wrap">
+                        <div class="wx-ticker" id="wx-ticker">EXTENDED FORECAST &middot; LIVE WEATHER &middot; BRAYDEN TV &middot; EXTENDED FORECAST &middot; LIVE WEATHER &middot; BRAYDEN TV &middot; EXTENDED FORECAST &middot; LIVE WEATHER &middot; BRAYDEN TV</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <p class="click-audio" id="audio-hint" onclick="toggleAudio()">[ Click for Audio ]</p>
         <div class="btn-row">
-            <button class="btn-channel" id="btn-main" onclick="exitKnicksMode()">Change Channel</button>
+            <button class="btn-channel" id="btn-main" onclick="exitSpecialMode()">Change Channel</button>
             <button class="btn-knicks" id="btn-knicks" onclick="enterKnicksMode()">Knicks Ch.</button>
+            <button class="btn-weather" id="btn-weather" onclick="enterWeatherMode()">Weather Ch.</button>
             <button class="btn-channel" onclick="toggleFullscreen()">Full Screen</button>
         </div>
+        <audio id="wx-audio" style="display:none"></audio>
         <p class="tv-footer-info" id="tv-status">[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]</p>
     </div>
 
@@ -500,7 +760,8 @@
         function enterKnicksMode() {
             video.pause();
             video.style.display = 'none';
-            ytFrame.src = `https://www.youtube.com/embed/?listType=playlist&list=${KNICKS_PLAYLIST}&autoplay=1&rel=0&controls=0&modestbranding=1&iv_load_policy=3`;
+            const startIndex = Math.floor(Math.random() * 15) + 1;
+            ytFrame.src = `https://www.youtube.com/embed/?listType=playlist&list=${KNICKS_PLAYLIST}&index=${startIndex}&autoplay=1&rel=0&controls=0&modestbranding=1&iv_load_policy=3`;
             ytFrame.style.display = 'block';
             btnKnicks.classList.add('active');
             btnMain.textContent  = '← Back to TV';
@@ -511,18 +772,224 @@
         }
 
         function exitKnicksMode() {
-            if (ytFrame.style.display === 'block') {
-                ytFrame.style.display = 'none';
-                ytFrame.src = '';
-                video.style.display  = 'block';
-                btnKnicks.classList.remove('active');
-                btnMain.textContent  = 'Change Channel';
-                document.getElementById('channel-id').style.color = '';
-                document.getElementById('channel-id').style.textShadow = '';
-                changeChannel();
-            } else {
-                changeChannel();
+            ytFrame.style.display = 'none';
+            ytFrame.src = '';
+            video.style.display  = 'block';
+            btnKnicks.classList.remove('active');
+            btnMain.textContent  = 'Change Channel';
+            document.getElementById('channel-id').style.color = '';
+            document.getElementById('channel-id').style.textShadow = '';
+            changeChannel();
+        }
+
+        // ── Weather Channel Mode ──
+        const wxScreen   = document.getElementById('weather-screen');
+        const wxAudio    = document.getElementById('wx-audio');
+        const btnWeather = document.getElementById('btn-weather');
+
+        const WX_BASE  = 'https://archive.org/download/WeatherChannelMusic/';
+        const WX_MUSIC = [
+            '3rd%20Force%20-%203rd%20Force.mp3',
+            '3rd%20Force%20-%20Between%20Friends.mp3',
+            '3rd%20Force%20-%20Full%20Circle.mp3',
+            '3rd%20Force%20-%20Loves%20The%20Reason.mp3',
+            '3rd%20Force%20-%20Ready%20For%20Love.mp3',
+            '3rd%20Force%20-%20The%20Gift.mp3',
+            '3rd%20Force%20-%20Towards%20The%20Light.mp3',
+            '3rd%20Force%20-%20We%20Should%20Be%20Together.mp3',
+            '3rd%20Force%20-%20Where%20It%20All%20Begins.mp3',
+            '3rd%20Force%20-%20You%20Know%20My%20Heart.mp3',
+            '7and5%20-%20Breathe%20In.mp3',
+            '7and5%20-%20Icy%20Blue.mp3',
+            '7and5%20-%20Questions.mp3',
+            'Aangell%20-%20Serendipity.mp3',
+            'Aangell%20-%20Thumper.mp3',
+        ];
+
+        const WMO = {
+            0:  ['☀️',  'CLEAR'],           1:  ['🌤️', 'MOSTLY CLEAR'],
+            2:  ['⛅',  'PARTLY CLOUDY'],    3:  ['☁️',  'OVERCAST'],
+            45: ['🌫️', 'FOGGY'],            48: ['🌫️', 'DENSE FOG'],
+            51: ['🌦️', 'LIGHT DRIZZLE'],   53: ['🌦️', 'DRIZZLE'],
+            55: ['🌧️', 'HEAVY DRIZZLE'],   61: ['🌧️', 'LIGHT RAIN'],
+            63: ['🌧️', 'RAIN'],            65: ['🌧️', 'HEAVY RAIN'],
+            71: ['❄️',  'LIGHT SNOW'],      73: ['❄️',  'SNOW'],
+            75: ['❄️',  'HEAVY SNOW'],      77: ['🌨️', 'SNOW GRAINS'],
+            80: ['🌦️', 'SHOWERS'],         81: ['🌧️', 'HEAVY SHOWERS'],
+            82: ['⛈️',  'VIOLENT SHOWERS'], 85: ['🌨️', 'SNOW SHOWERS'],
+            86: ['🌨️', 'HEAVY SNOW SHOWERS'], 95: ['⛈️', 'THUNDERSTORM'],
+            96: ['⛈️',  'THUNDERSTORM W/ HAIL'], 99: ['⛈️', 'SEVERE THUNDERSTORM'],
+        };
+
+        function wmoInfo(code) { return WMO[code] || ['🌡️', 'UNKNOWN']; }
+
+        let wxClockInterval   = null;
+        let wxRefreshInterval = null;
+        let wxLastMusicIdx    = -1;
+        let wxMode            = false;
+
+        function enterWeatherMode() {
+            video.pause();
+            video.style.display   = 'none';
+            ytFrame.style.display = 'none';
+            ytFrame.src           = '';
+            btnKnicks.classList.remove('active');
+
+            wxScreen.style.display = 'block';
+            document.getElementById('wx-picker').style.display  = 'flex';
+            document.getElementById('wx-display').style.display = 'none';
+            document.getElementById('wx-picker-error').textContent = '';
+            document.getElementById('wx-zip').value = '';
+
+            btnWeather.classList.add('active');
+            btnMain.textContent = '← Back to TV';
+            document.getElementById('channel-id').textContent      = 'WEATHER';
+            document.getElementById('channel-id').style.color      = '#7ec8e3';
+            document.getElementById('channel-id').style.textShadow = '0 0 6px #7ec8e3';
+            status.textContent = '[ LOCAL FORECAST — LIVE ]';
+            wxMode = true;
+        }
+
+        function exitWeatherMode() {
+            clearInterval(wxClockInterval);
+            clearInterval(wxRefreshInterval);
+            wxClockInterval = wxRefreshInterval = null;
+            wxMode = false;
+
+            wxAudio.pause();
+            wxAudio.src = '';
+
+            wxScreen.style.display = 'none';
+            btnWeather.classList.remove('active');
+            video.style.display = 'block';
+            document.getElementById('channel-id').style.color      = '';
+            document.getElementById('channel-id').style.textShadow = '';
+            btnMain.textContent = 'Change Channel';
+            changeChannel();
+        }
+
+        function submitZip() {
+            const zip = document.getElementById('wx-zip').value.trim();
+            if (!/^\d{5}$/.test(zip)) {
+                document.getElementById('wx-picker-error').textContent = 'ENTER A VALID 5-DIGIT ZIP CODE';
+                return;
             }
+            document.getElementById('wx-picker-error').textContent = 'LOOKING UP...';
+            fetch(`https://api.zippopotam.us/us/${zip}`)
+                .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+                .then(d => {
+                    const place = d.places[0];
+                    const city  = `${place['place name'].toUpperCase()}, ${place['state abbreviation']}`;
+                    loadWeatherData(parseFloat(place.latitude), parseFloat(place.longitude), city);
+                })
+                .catch(() => {
+                    document.getElementById('wx-picker-error').textContent = 'ZIP CODE NOT FOUND — TRY AGAIN';
+                });
+        }
+
+        function useMyLocation() {
+            if (!navigator.geolocation) {
+                document.getElementById('wx-picker-error').textContent = 'GEOLOCATION NOT SUPPORTED — ENTER ZIP CODE';
+                return;
+            }
+            document.getElementById('wx-picker-error').textContent = 'ACQUIRING SIGNAL...';
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const { latitude: lat, longitude: lon } = pos.coords;
+                    fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`)
+                        .then(r => r.json())
+                        .then(d => {
+                            const city = `${(d.city || d.locality || 'YOUR AREA').toUpperCase()}, ${(d.principalSubdivisionCode || '').replace(/^US-/, '')}`;
+                            loadWeatherData(lat, lon, city);
+                        })
+                        .catch(() => loadWeatherData(lat, lon, 'YOUR AREA'));
+                },
+                () => {
+                    document.getElementById('wx-picker-error').textContent = 'LOCATION DENIED — PLEASE ENTER ZIP CODE';
+                }
+            );
+        }
+
+        async function loadWeatherData(lat, lon, city) {
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+                    `&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m,apparent_temperature` +
+                    `&daily=temperature_2m_max,temperature_2m_min,weathercode` +
+                    `&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=auto&forecast_days=6`;
+                const res  = await fetch(url);
+                const data = await res.json();
+                renderWeatherDisplay(data, city);
+                playWeatherMusic();
+                startWxClock();
+                clearInterval(wxRefreshInterval);
+                wxRefreshInterval = setInterval(() => loadWeatherData(lat, lon, city), 10 * 60 * 1000);
+            } catch (e) {
+                document.getElementById('wx-picker-error').textContent = 'WEATHER DATA UNAVAILABLE — TRY AGAIN';
+            }
+        }
+
+        function renderWeatherDisplay(data, city) {
+            const cur  = data.current;
+            const daily = data.daily;
+            const [icon, label] = wmoInfo(cur.weathercode);
+
+            document.getElementById('wx-city').textContent      = city;
+            document.getElementById('wx-icon').textContent      = icon;
+            document.getElementById('wx-temp').textContent      = `${Math.round(cur.temperature_2m)}°F`;
+            document.getElementById('wx-condition').textContent = label;
+            document.getElementById('wx-detail').textContent    =
+                `WIND: ${Math.round(cur.windspeed_10m)} MPH\nHUMIDITY: ${cur.relativehumidity_2m}%\nFEELS LIKE: ${Math.round(cur.apparent_temperature)}°F`;
+
+            const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+            const row  = document.getElementById('wx-forecast-row');
+            row.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const date    = new Date(daily.time[i] + 'T12:00:00');
+                const dayName = days[date.getDay()];
+                const [dIcon] = wmoInfo(daily.weathercode[i]);
+                const hi      = Math.round(daily.temperature_2m_max[i]);
+                const lo      = Math.round(daily.temperature_2m_min[i]);
+                row.innerHTML += `<div class="wx-day">
+                    <div class="wx-day-name">${dayName}</div>
+                    <div class="wx-day-icon">${dIcon}</div>
+                    <div class="wx-day-hi">${hi}°</div>
+                    <div class="wx-day-lo">${lo}°</div>
+                </div>`;
+            }
+
+            document.getElementById('wx-picker').style.display  = 'none';
+            document.getElementById('wx-display').style.display = 'flex';
+        }
+
+        function startWxClock() {
+            clearInterval(wxClockInterval);
+            function tick() {
+                const now  = new Date();
+                const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+                const h    = now.getHours() % 12 || 12;
+                const m    = String(now.getMinutes()).padStart(2, '0');
+                const ampm = now.getHours() < 12 ? 'AM' : 'PM';
+                document.getElementById('wx-clock').textContent =
+                    `${days[now.getDay()]}  ${h}:${m} ${ampm}`;
+            }
+            tick();
+            wxClockInterval = setInterval(tick, 1000);
+        }
+
+        function playWeatherMusic() {
+            let idx;
+            do { idx = Math.floor(Math.random() * WX_MUSIC.length); } while (idx === wxLastMusicIdx && WX_MUSIC.length > 1);
+            wxLastMusicIdx = idx;
+            wxAudio.src    = WX_BASE + WX_MUSIC[idx];
+            wxAudio.volume = 0.6;
+            wxAudio.play().catch(() => {});
+            wxAudio.onended = playWeatherMusic;
+        }
+
+        function exitSpecialMode() {
+            if (wxMode)                                exitWeatherMode();
+            else if (ytFrame.style.display === 'block') exitKnicksMode();
+            else                                        changeChannel();
         }
     </script>
 </body>
