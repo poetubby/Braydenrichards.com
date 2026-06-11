@@ -607,7 +607,7 @@
                         </div>
                     </div>
                     <div class="wx-ticker-wrap">
-                        <div class="wx-ticker" id="wx-ticker">EXTENDED FORECAST &middot; LIVE WEATHER &middot; BRAYDEN TV &middot; EXTENDED FORECAST &middot; LIVE WEATHER &middot; BRAYDEN TV &middot; EXTENDED FORECAST &middot; LIVE WEATHER &middot; BRAYDEN TV</div>
+                        <div class="wx-ticker" id="wx-ticker">LOADING HEADLINES &middot; PLEASE STAND BY &middot;</div>
                     </div>
                 </div>
             </div>
@@ -901,6 +901,7 @@
         let wxClockInterval   = null;
         let wxRefreshInterval = null;
         let wxPanelInterval   = null;
+        let wxNewsInterval    = null;
         let wxLastMusicIdx    = -1;
         let wxMode            = false;
         let wxCurrentData     = null;
@@ -932,7 +933,8 @@
             clearInterval(wxClockInterval);
             clearInterval(wxRefreshInterval);
             clearInterval(wxPanelInterval);
-            wxClockInterval = wxRefreshInterval = wxPanelInterval = null;
+            clearInterval(wxNewsInterval);
+            wxClockInterval = wxRefreshInterval = wxPanelInterval = wxNewsInterval = null;
             wxCurrentData   = null;
             wxMode          = false;
 
@@ -1002,8 +1004,11 @@
                 renderWeatherDisplay(data, city);
                 playWeatherMusic();
                 startWxClock();
+                fetchAndSetHeadlines();
                 clearInterval(wxRefreshInterval);
+                clearInterval(wxNewsInterval);
                 wxRefreshInterval = setInterval(() => loadWeatherData(lat, lon, city), 10 * 60 * 1000);
+                wxNewsInterval    = setInterval(fetchAndSetHeadlines, 15 * 60 * 1000);
             } catch (e) {
                 document.getElementById('wx-picker-error').textContent = 'WEATHER DATA UNAVAILABLE — TRY AGAIN';
             }
@@ -1151,6 +1156,23 @@
             wxAudio.volume = 0.6;
             wxAudio.play().catch(() => {});
             wxAudio.onended = playWeatherMusic;
+        }
+
+        async function fetchAndSetHeadlines() {
+            const ticker = document.getElementById('wx-ticker');
+            try {
+                const rss = encodeURIComponent('https://feeds.bbci.co.uk/news/rss.xml');
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rss}&count=12`);
+                const data = await res.json();
+                if (!data.items || !data.items.length) throw new Error();
+                const line = data.items.map(i => i.title).join('  ·  ');
+                ticker.textContent = line + '  ·  ' + line;
+                ticker.style.animation = 'none';
+                void ticker.offsetWidth;
+                ticker.style.animation = '';
+            } catch (e) {
+                ticker.textContent = 'NEWS UNAVAILABLE  ·  EXTENDED FORECAST  ·  LIVE WEATHER  ·  BRAYDEN TV';
+            }
         }
 
         function exitSpecialMode() {
