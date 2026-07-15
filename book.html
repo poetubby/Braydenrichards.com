@@ -78,6 +78,64 @@
             color: #005a17;
             letter-spacing: 0.08em;
         }
+
+        .edition-selector {
+            display: flex;
+            gap: 0;
+        }
+
+        .edition-btn {
+            background: transparent;
+            border: 1px solid #00ff41;
+            color: #005a17;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: 0.82em;
+            padding: 8px 24px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            transition: all 0.15s;
+        }
+
+        .edition-btn + .edition-btn { border-left: none; }
+
+        .edition-btn.active {
+            background: rgba(0, 255, 65, 0.1);
+            color: #00ff41;
+            text-shadow: 0 0 6px #00ff41;
+            box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.12);
+        }
+
+        .edition-btn:hover:not(.active) {
+            color: #00ff41;
+        }
+
+        #cover-preview {
+            position: fixed;
+            display: none;
+            z-index: 50;
+            background: #0a0a00;
+            border: 1px solid #00ff41;
+            box-shadow: 0 0 16px #00ff41, 0 0 40px rgba(0,255,65,0.15);
+            padding: 6px 6px 4px;
+            pointer-events: none;
+        }
+
+        #cover-preview canvas {
+            display: block;
+            width: 150px;
+            height: auto;
+        }
+
+        #cover-preview-label {
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: 0.62em;
+            letter-spacing: 0.18em;
+            color: #00ff41;
+            text-shadow: 0 0 6px #00ff41;
+            text-align: center;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -89,6 +147,11 @@
     <h1>Zine</h1>
 
     <div class="book-wrapper">
+        <div class="edition-selector">
+            <button class="edition-btn active" onclick="selectEdition(this, 'Assets/indb/Zine.pdf')">Edition 1</button>
+            <button class="edition-btn" onclick="selectEdition(this, 'Assets/indb/July Zine.pdf')">Edition 2</button>
+        </div>
+
         <div id="loading">[ INITIALIZING... ]</div>
 
         <div id="book-container">
@@ -104,16 +167,45 @@
         <p class="hint">[ CLICK PAGES OR USE BUTTONS TO TURN ]</p>
     </div>
 
+    <div id="cover-preview">
+        <canvas id="cover-preview-canvas"></canvas>
+        <div id="cover-preview-label"></div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://unpkg.com/page-flip/dist/js/page-flip.browser.js"></script>
     <script>
-        const PDF_URL = 'Assets/indb/Zine.pdf';
         const RENDER_SCALE = 2;
 
         pdfjsLib.GlobalWorkerOptions.workerSrc =
             'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        async function init() {
+        let currentPageFlip = null;
+
+        function selectEdition(btn, url) {
+            document.querySelectorAll('.edition-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Reset UI for reload
+            const bookEl      = document.getElementById('book');
+            const containerEl = document.getElementById('book-container');
+            const controlsEl  = document.getElementById('controls');
+            const loadingEl   = document.getElementById('loading');
+
+            if (currentPageFlip) {
+                currentPageFlip.destroy();
+                currentPageFlip = null;
+            }
+            bookEl.innerHTML          = '';
+            containerEl.style.display = 'none';
+            controlsEl.style.display  = 'none';
+            loadingEl.style.display   = 'block';
+            loadingEl.textContent     = '[ INITIALIZING... ]';
+
+            init(url);
+        }
+
+        async function init(PDF_URL = 'Assets/indb/Zine.pdf') {
             const loadingEl   = document.getElementById('loading');
             const containerEl = document.getElementById('book-container');
             const controlsEl  = document.getElementById('controls');
@@ -166,7 +258,7 @@
                 containerEl.style.display = 'block';
                 controlsEl.style.display  = 'flex';
 
-                const pageFlip = new St.PageFlip(bookEl, {
+                currentPageFlip = new St.PageFlip(bookEl, {
                     width:               displayW,
                     height:              displayH,
                     size:                'fixed',
@@ -180,20 +272,20 @@
                     maxShadowOpacity:    0.4,
                 });
 
-                pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+                currentPageFlip.loadFromHTML(document.querySelectorAll('.page'));
 
                 function updateUI() {
-                    const idx = pageFlip.getCurrentPageIndex();
+                    const idx = currentPageFlip.getCurrentPageIndex();
                     counter.textContent = `PAGE ${idx + 1} / ${numPages}`;
                     btnPrev.disabled = idx === 0;
                     btnNext.disabled = idx >= numPages - 1;
                 }
 
-                pageFlip.on('flip', updateUI);
+                currentPageFlip.on('flip', updateUI);
                 updateUI();
 
-                btnPrev.addEventListener('click', () => pageFlip.flipPrev());
-                btnNext.addEventListener('click', () => pageFlip.flipNext());
+                btnPrev.onclick = () => currentPageFlip.flipPrev();
+                btnNext.onclick = () => currentPageFlip.flipNext();
 
             } catch (err) {
                 loadingEl.textContent = `[ ERROR: ${err.message} ]`;
@@ -202,6 +294,63 @@
         }
 
         init();
+
+        // ── Edition cover previews ──
+        const EDITIONS = [
+            { url: 'Assets/indb/Zine.pdf',      label: 'EDITION 1' },
+            { url: 'Assets/indb/July Zine.pdf',  label: 'EDITION 2' },
+        ];
+        const coverCache = {};
+
+        async function renderCover(url) {
+            if (coverCache[url]) return coverCache[url];
+            const pdf    = await pdfjsLib.getDocument(url).promise;
+            const page   = await pdf.getPage(1);
+            const vp     = page.getViewport({ scale: 0.6 });
+            const canvas = document.createElement('canvas');
+            canvas.width  = Math.floor(vp.width);
+            canvas.height = Math.floor(vp.height);
+            await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+            coverCache[url] = canvas;
+            return canvas;
+        }
+
+        const preview      = document.getElementById('cover-preview');
+        const previewCanvas = document.getElementById('cover-preview-canvas');
+        const previewLabel = document.getElementById('cover-preview-label');
+
+        document.querySelectorAll('.edition-btn').forEach((btn, i) => {
+            const edition = EDITIONS[i];
+
+            btn.addEventListener('mouseenter', async () => {
+                try {
+                    const src = await renderCover(edition.url);
+                    // Copy rendered canvas into the preview canvas
+                    previewCanvas.width  = src.width;
+                    previewCanvas.height = src.height;
+                    previewCanvas.getContext('2d').drawImage(src, 0, 0);
+                    previewLabel.textContent = edition.label;
+
+                    preview.style.display = 'block';
+                    const rect = btn.getBoundingClientRect();
+                    const pw   = preview.offsetWidth;
+                    const ph   = preview.offsetHeight;
+                    let left   = rect.left + rect.width / 2 - pw / 2;
+                    let top    = rect.top - ph - 12;
+                    left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+                    if (top < 8) top = rect.bottom + 12;
+                    preview.style.left = left + 'px';
+                    preview.style.top  = top  + 'px';
+                } catch (e) { /* cover unavailable */ }
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                preview.style.display = 'none';
+            });
+        });
+
+        // Pre-warm the cache after the main book has had a moment to render
+        setTimeout(() => EDITIONS.forEach(e => renderCover(e.url).catch(() => {})), 1500);
     </script>
 <footer>
     <p>Visit my Ole Pal Jake's Site.</p>

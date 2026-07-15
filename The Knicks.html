@@ -72,6 +72,14 @@ falling deeply. This isnt new to New York. They have had a bad night of shooting
 
 We stay balling.
 
+
+Ha! This is crazy! We won this game!!!!
+
+In retrospect this game was absolutley insane. I had pretty much given up hope on the knicks. I created this page during half time. But WoW! I learned to never give up. Not only on the Knicks but I was amazed at how much its possible to beat the odds. The knicks had a .04% Chance
+To win this game. But they did it! 
+
+Never Give Up!!!
+
 <div id="score-widget">
     <div class="widget-title">[ KNICKS LIVE SCORE ]</div>
     <div id="score-body">Checking for a game today...</div>
@@ -84,6 +92,15 @@ We stay balling.
 </footer>
 
 <script>
+    // Autoplay Empire State of Mind on page load
+    const bgMusic = new Audio('Assets/Music/JAŸ-Z - Empire State Of Mind ft. Alicia Keys.mp3');
+    bgMusic.loop   = true;
+    bgMusic.volume = 0.5;
+    bgMusic.play().catch(() => {
+        // Autoplay blocked — play on first user interaction
+        document.addEventListener('click', () => bgMusic.play(), { once: true });
+    });
+
     const KNICKS_ID = 1610612752;
 
     async function fetchScore() {

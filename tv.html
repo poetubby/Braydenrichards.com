@@ -657,6 +657,8 @@
         let savedTime           = 0;
         let currentChannelIndex = 0;
         let lastChannelIndex    = -1;
+        let knicksMode          = false;
+        let driveFrame          = false;
 
         // Track real elapsed playback time (ignores pauses / buffering)
         video.addEventListener('timeupdate', () => {
@@ -701,6 +703,34 @@
             return entry;
         }
 
+        // Play whichever entry is at currentChannelIndex — video or drive iframe.
+        function playCurrentEntry(startRandom) {
+            const entry = resolveEntry(currentChannelIndex);
+            if (entry.type === 'drive') {
+                video.removeEventListener('ended', onMainEnded);
+                video.pause();
+                video.style.display   = 'none';
+                ytFrame.src           = entry.url;
+                ytFrame.style.display = 'block';
+                driveFrame            = true;
+                status.textContent    = '[ ' + entry.title.toUpperCase() + ' — PLAYING ]';
+            } else {
+                if (driveFrame) {
+                    ytFrame.style.display = 'none';
+                    ytFrame.src           = '';
+                    video.style.display   = 'block';
+                    driveFrame            = false;
+                }
+                video.src = entry.url;
+                video.addEventListener('loadedmetadata', () => {
+                    video.currentTime = startRandom ? Math.random() * video.duration : 0;
+                    video.play().catch(() => {});
+                }, { once: true });
+                video.addEventListener('error', onMainEnded, { once: true });
+                video.addEventListener('ended', onMainEnded, { once: true });
+            }
+        }
+
         function onMainEnded() {
             // Auto-play next video — never the same one back-to-back
             lastChannelIndex    = currentChannelIndex;
@@ -708,13 +738,7 @@
             totalPlayedMs       = 0;
             setChannelDisplay(currentChannelIndex);
             status.textContent  = '[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]';
-            video.src = resolveEntry(currentChannelIndex).url;
-            video.addEventListener('loadedmetadata', () => {
-                video.currentTime = 0;
-                video.play().catch(() => {});
-            }, { once: true });
-            video.addEventListener('error', onMainEnded, { once: true });
-            video.addEventListener('ended', onMainEnded, { once: true });
+            playCurrentEntry(false);
         }
 
         function startMainContent(resume = false) {
@@ -730,17 +754,12 @@
                     video.currentTime = savedTime;
                     video.play();
                 }, { once: true });
+                video.addEventListener('ended', onMainEnded, { once: true });
             } else {
                 currentChannelIndex = pickIndex(lastChannelIndex);
                 setChannelDisplay(currentChannelIndex);
-                video.src = resolveEntry(currentChannelIndex).url;
-                video.addEventListener('loadedmetadata', () => {
-                    video.currentTime = Math.random() * video.duration;
-                    video.play();
-                }, { once: true });
+                playCurrentEntry(true);
             }
-
-            video.addEventListener('ended', onMainEnded, { once: true });
         }
 
         function changeChannel() {
@@ -754,12 +773,7 @@
             video.loop     = false;
             setChannelDisplay(currentChannelIndex);
             status.textContent = '[ TUNING IN PROGRESS — STREAM ALREADY IN PROGRESS ]';
-            video.src = resolveEntry(currentChannelIndex).url;
-            video.addEventListener('loadedmetadata', () => {
-                video.currentTime = Math.random() * video.duration;
-                video.play();
-            }, { once: true });
-            video.addEventListener('ended', onMainEnded, { once: true });
+            playCurrentEntry(true);
         }
 
         function playCommercial() {
@@ -828,12 +842,20 @@
         // Classic Knicks Games playlist (verified via YouTube search)
         const KNICKS_PLAYLIST = 'PLicsvblzBrmzSYJXH1D_iAuqdn7tT28r0';
 
+        const DRIVE_KNICKS_URL = 'https://drive.google.com/file/d/1IXmYsL5LCDze57DWY7q_7F4XMTvbhwwu/preview';
+
         function enterKnicksMode() {
             video.pause();
             video.style.display = 'none';
-            const startIndex = Math.floor(Math.random() * 15) + 1;
-            ytFrame.src = `https://www.youtube.com/embed/?listType=playlist&list=${KNICKS_PLAYLIST}&index=${startIndex}&autoplay=1&rel=0&controls=0&modestbranding=1&iv_load_policy=3`;
+            driveFrame = false;
+            if (Math.random() < 0.5) {
+                const startIndex = Math.floor(Math.random() * 15) + 1;
+                ytFrame.src = `https://www.youtube.com/embed/?listType=playlist&list=${KNICKS_PLAYLIST}&index=${startIndex}&autoplay=1&rel=0&controls=0&modestbranding=1&iv_load_policy=3`;
+            } else {
+                ytFrame.src = DRIVE_KNICKS_URL;
+            }
             ytFrame.style.display = 'block';
+            knicksMode = true;
             btnKnicks.classList.add('active');
             btnMain.textContent  = '← Back to TV';
             document.getElementById('channel-id').textContent = 'KNICKS CH.';
@@ -846,6 +868,7 @@
             ytFrame.style.display = 'none';
             ytFrame.src = '';
             video.style.display  = 'block';
+            knicksMode = false;
             btnKnicks.classList.remove('active');
             btnMain.textContent  = 'Change Channel';
             document.getElementById('channel-id').style.color = '';
@@ -912,6 +935,8 @@
             video.style.display   = 'none';
             ytFrame.style.display = 'none';
             ytFrame.src           = '';
+            knicksMode = false;
+            driveFrame = false;
             btnKnicks.classList.remove('active');
 
             wxScreen.style.display = 'block';
@@ -1180,9 +1205,9 @@
         }
 
         function exitSpecialMode() {
-            if (wxMode)                                exitWeatherMode();
-            else if (ytFrame.style.display === 'block') exitKnicksMode();
-            else                                        changeChannel();
+            if (wxMode)        exitWeatherMode();
+            else if (knicksMode) exitKnicksMode();
+            else               changeChannel();
         }
     </script>
 </body>
