@@ -196,7 +196,8 @@
                 currentPageFlip.destroy();
                 currentPageFlip = null;
             }
-            bookEl.innerHTML          = '';
+            // destroy() removes the #book element from the DOM, so recreate it
+            containerEl.innerHTML = '<div id="book"></div>';
             containerEl.style.display = 'none';
             controlsEl.style.display  = 'none';
             loadingEl.style.display   = 'block';
