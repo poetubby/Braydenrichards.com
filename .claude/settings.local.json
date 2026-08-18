@@ -5,7 +5,11 @@
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
       "Bash(ssh -o StrictHostKeyChecking=no poetubby@192.168.86.40 \"ls /home/poetubby/rpi_printer/sources/ && echo '---' && ls /home/poetubby/rpi_printer/triggers/ && echo '---' && ls /home/poetubby/rpi_printer/scheduler/\")",
-      "Bash(ssh -o StrictHostryKeyChecking=no poetubby@192.168.86.40 \"cat /home/poetubby/rpi_printer/printer/handler.py && echo '===SCHEDULER===' && cat /home/poetubby/rpi_printer/scheduler/jobs.py && echo '===WEATHER_SUMMARY===' && cat /home/poetubby/rpi_printer/sources/weather_summary.py\")"
+      "Bash(ssh -o StrictHostryKeyChecking=no poetubby@192.168.86.40 \"cat /home/poetubby/rpi_printer/printer/handler.py && echo '===SCHEDULER===' && cat /home/poetubby/rpi_printer/scheduler/jobs.py && echo '===WEATHER_SUMMARY===' && cat /home/poetubby/rpi_printer/sources/weather_summary.py\")",
+      "Read(//private/tmp/**)",
+      "Bash(split -l 21 tv_urls.tsv part_)",
+      "Bash(curl -s --max-time 15 \"https://archive.org/metadata/2005variouscommercials\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d.get\\('server'\\), d.get\\('d1'\\), d.get\\('d2'\\)\\); print\\([f['name'] for f in d.get\\('files',[]\\) if 'Musketeers' in f['name']]\\)\")"
     ]
   }
 }

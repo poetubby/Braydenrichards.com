@@ -1,0 +1,21 @@
+name = "brain-worker"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# Custom domain for the API. Requires the zone (braydenrichards.com) to be on
+# this Cloudflare account, and this subdomain to NOT also be defined as a
+# plain DNS record pointing elsewhere — Workers custom domains manage their
+# own DNS entry automatically on first deploy.
+[[routes]]
+pattern = "brain-api.braydenrichards.com/*"
+custom_domain = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "brain"
+database_id = "REPLACE_AFTER_RUNNING_wrangler_d1_create"
+
+# Secrets (do NOT put these here — set via `wrangler secret put <NAME>`):
+#   TWILIO_AUTH_TOKEN   — from the Twilio console, used to verify inbound webhook signatures
+#   OWNER_PHONE_NUMBER  — your phone number in E.164 format (e.g. +15551234567),
+#                          the only number allowed to write notes

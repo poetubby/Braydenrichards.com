@@ -1,0 +1,530 @@
+<title>Brayden TV — Diagnostic Report</title>
+<style>
+  :root {
+    --bg: #f3f1e9;
+    --panel: #fffefa;
+    --panel-2: #ece8dc;
+    --border: #cfc9b4;
+    --text: #262420;
+    --text-dim: #6b6656;
+    --accent: #1f7a3f;
+    --accent-dim: #4d8f66;
+    --critical: #b23a1f;
+    --critical-bg: #f6e4dd;
+    --warn: #8a5a12;
+    --warn-bg: #f4e6c9;
+    --ok: #1f7a3f;
+    --ok-bg: #e2ecdf;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Menlo", "Consolas", "Liberation Mono", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #07090a;
+      --panel: #0e1512;
+      --panel-2: #121b17;
+      --border: #1e332a;
+      --text: #cfe0d4;
+      --text-dim: #6d8478;
+      --accent: #38f085;
+      --accent-dim: #2c9f5f;
+      --critical: #ff6b52;
+      --critical-bg: #2b1310;
+      --warn: #ffc23c;
+      --warn-bg: #2b210a;
+      --ok: #38f085;
+      --ok-bg: #0f2317;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #07090a;
+    --panel: #0e1512;
+    --panel-2: #121b17;
+    --border: #1e332a;
+    --text: #cfe0d4;
+    --text-dim: #6d8478;
+    --accent: #38f085;
+    --accent-dim: #2c9f5f;
+    --critical: #ff6b52;
+    --critical-bg: #2b1310;
+    --warn: #ffc23c;
+    --warn-bg: #2b210a;
+    --ok: #38f085;
+    --ok-bg: #0f2317;
+  }
+  :root[data-theme="light"] {
+    --bg: #f3f1e9;
+    --panel: #fffefa;
+    --panel-2: #ece8dc;
+    --border: #cfc9b4;
+    --text: #262420;
+    --text-dim: #6b6656;
+    --accent: #1f7a3f;
+    --accent-dim: #4d8f66;
+    --critical: #b23a1f;
+    --critical-bg: #f6e4dd;
+    --warn: #8a5a12;
+    --warn-bg: #f4e6c9;
+    --ok: #1f7a3f;
+    --ok-bg: #e2ecdf;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+  }
+  body {
+    padding: clamp(20px, 4vw, 56px);
+    display: flex;
+    justify-content: center;
+  }
+  main {
+    width: 100%;
+    max-width: 780px;
+  }
+
+  .masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--text);
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  .masthead h1 {
+    font-size: 1.05rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin: 0;
+    font-weight: 700;
+  }
+  .masthead .meta {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 22px;
+  }
+  .stat {
+    background: var(--panel);
+    padding: 14px 16px;
+  }
+  .stat-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-size: 1.5rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+  }
+  .stat-value.critical { color: var(--critical); }
+  .stat-value.ok { color: var(--ok); }
+
+  .verdict {
+    border: 1px solid var(--accent-dim);
+    background: var(--ok-bg);
+    padding: 18px 20px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .verdict::before {
+    content: "DIAGNOSIS";
+    position: absolute;
+    top: -9px;
+    left: 14px;
+    background: var(--bg);
+    padding: 0 6px;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+  }
+  .verdict h2 {
+    margin: 4px 0 10px;
+    font-size: 0.95rem;
+    color: var(--accent);
+  }
+  .verdict p {
+    margin: 0 0 10px;
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: var(--text);
+  }
+  .verdict p:last-child { margin-bottom: 0; }
+  .verdict code {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    padding: 1px 5px;
+    font-size: 0.78em;
+    color: var(--critical);
+  }
+  .verdict .callout {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+  .verdict .callout b { color: var(--text); font-weight: 700; }
+
+  h2.section-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin: 32px 0 16px;
+  }
+
+  .group {
+    margin-bottom: 22px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .group-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+  .group-head h3 {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.4;
+  }
+  .group-count {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .group-note {
+    margin: 0;
+    padding: 10px 14px;
+    font-size: 0.76rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sev-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .sev-dot.sev-outage { background: var(--warn); }
+  .sev-dot.sev-dead { background: var(--critical); }
+  .sev-dot.sev-expected { background: var(--text-dim); }
+
+  .item-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  .item-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    padding: 7px 14px;
+    font-size: 0.78rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .item-list li:last-child { border-bottom: none; }
+  .item-title { color: var(--text); overflow-wrap: anywhere; }
+  .item-code {
+    font-size: 0.66rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .item-code.sev-outage { color: var(--warn); background: var(--warn-bg); }
+  .item-code.sev-dead { color: var(--critical); background: var(--critical-bg); }
+  .item-code.sev-expected { color: var(--text-dim); background: var(--panel-2); }
+
+  .item-list::-webkit-scrollbar { width: 8px; }
+  .item-list::-webkit-scrollbar-track { background: var(--panel); }
+  .item-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .next-steps {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    padding: 16px 18px;
+    margin-top: 8px;
+  }
+  .next-steps ol {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 0.8rem;
+    line-height: 1.9;
+  }
+  .next-steps li::marker {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  footer {
+    margin-top: 32px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+</style>
+
+<main>
+  <div class="masthead">
+    <h1>Brayden TV — Diagnostic Report</h1>
+    <div class="meta">Checked every URL in tv-playlist.json<br>2026-08-14 · via HEAD/range requests</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Items Checked</div>
+      <div class="stat-value">125</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Playing Fine</div>
+      <div class="stat-value ok">22</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Failing Right Now</div>
+      <div class="stat-value critical">103</div>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h2>This isn't a broken playlist — Internet Archive is having an outage</h2>
+    <p>
+      82% of the catalog is failing, but the pattern gives it away: <code>archive.org</code>'s
+      homepage and metadata API both respond normally (<code>200</code>), and every file is still
+      listed in its item's metadata. It's specifically the <b>file-serving layer</b> that's down.
+      Sixty of the failures come straight from Internet Archive's own backend, which returns a page
+      titled <em>"Internet Archive: Error"</em> with the trace <code>download.php:1059:exit_service_unavailable</code>
+      — that's their code, not a network issue on this end. Another 35 come from individual storage
+      nodes (e.g. <code>dn711504.ca.archive.org</code>) throwing <code>500</code>s while that same
+      item's metadata confirms the file is still there.
+    </p>
+    <p>
+      Retried every failure three times, several minutes apart, with redirects followed — the
+      failures held steady, so this isn't a one-off blip from the check itself.
+    </p>
+    <div class="callout">
+      <span>→</span>
+      <span><b>Action for the playlist:</b> none needed. These URLs should start working again once
+      Internet Archive's outage clears — nothing here points to files being deleted or the JSON
+      being wrong.</span>
+    </div>
+  </div>
+
+  <h2 class="section-label">Failures by cause (103)</h2>
+
+  
+    <section class="group">
+      <div class="group-head">
+        <h3><span class="sev-dot sev-outage"></span>Archive.org: 503 Service Unavailable (exit_service_unavailable)</h3>
+        <span class="group-count">60 items</span>
+      </div>
+      <p class="group-note">Archive.org&#x27;s own frontend accepted the request, then its download service explicitly refused it. This is Internet Archive&#x27;s outage, not a dead link.</p>
+      <ul class="item-list">
+        <li><span class="item-title">2005 3 Musketeers Candy Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Albany RV Campers Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Along Came A Spider CBS Premiere Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Beano Drug Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Bertolli Shrimp Scampi &amp; Linguine Food Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Bissel Flip-It Vacuum Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Bounty Commercials</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Breyers Yogurt Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Burger King Chicken Sandwich Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 CBS Big Brother 5 Premiere Promo Clip Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 CBS Elvis Movie Promo Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 CBS Hallmark Riding The Bus With My Sister Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 CBS News New Pope Elected VHS Clip</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Charmin Toilet Paper Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Children&#x27;s Benadryl Allergy Fastmelt Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Crosstown Expo Center NY Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Dannon Yogurt Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Dell Dimension 2400 &amp; Inspiron 1200 Computer Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Denny&#x27;s Food Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Disney&#x27;s Pocahontas DVD Set Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Duncan Hines Whipped Frosting Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Fox 23 Disfunction Junction Promo Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Fox 23 LOL Promo Clip Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Gerber Grins &amp; Giggles Baby Lotion Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Gerber Peas Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Glucerna Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 GoLean Crunch Food Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Honey Bunches Of Oats Cereal Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 HoverCopter Order Promo Clip Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 HoverCopter Order Promo Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Imitrex Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 K-Mart Gifts For Dad Sale Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Kodak EasyShare Camera &amp; Base Printer Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Lanacane Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Martin, Harding &amp; Mazzotti Lawyer Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Metamucil Plus Calcium Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Milky Way Candy Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Miracle-Gro Garden Soil Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Monistat Soothin Care Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Nasonex Bee Drug Commercials</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Neutrogena MicroMist Tanning Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Olay Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Pampers Diaper Steps Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Pepto Bismol Cherry Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Philips Sonicare Crest Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Planters Mr. Peanut Dry Roasted Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Poligrip Strips Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Puppy &amp; Dog Chow Full Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Raymour &amp; Flanigan Online Credit Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Restasis Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 S&amp;K Clothing Commercials</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Small Smiles Dentistry Of Albany Medicaid Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Spray N Wash Dual Power Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 The Phantom Of The Opera DVD Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Vagisil Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Verizon Wireless Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Viactiv Vitamin Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 WRGB 6 Saratoga Job Fair May 9th Promo Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">2005 Zelnorm Drug Commercial</span><span class="item-code sev-outage">503</span></li>
+<li><span class="item-title">Twin Peaks :: Twin Peaks S02E22 - Beyond Life And Death</span><span class="item-code sev-outage">503</span></li>
+      </ul>
+    </section>
+
+    <section class="group">
+      <div class="group-head">
+        <h3><span class="sev-dot sev-outage"></span>Archive node: 500 Internal Server Error</h3>
+        <span class="group-count">35 items</span>
+      </div>
+      <p class="group-note">The specific storage node named in the playlist (e.g. dn711504.ca.archive.org) is erroring, but the item&#x27;s metadata still lists the file as present.</p>
+      <ul class="item-list">
+        <li><span class="item-title">2001 McDonald&#x27;s Chicken Breast Parmesan Sandwich Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2001 Nike Running Shoes Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 Albany River Rats Hockey Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 Aquafresh Multi-Action Whitening Toothpaste Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 Bloussant Herbal Breast Enhancer Pills Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 CBS The Amazing Race Promo Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 CBS Victoria&#x27;s Secret Fashion Show Promo</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 Chef Boyardee Pepperoni Pizzazoaroli Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 Coco Puffs Cereal CD Game Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 Eight Crazy Nights Adam Sandler Movie Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 Fox23 King Of The Hill Promo</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 Hyundai Santa Fe Car Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 Ichiban Japanese Chinese Food Albany Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 Kelloggs Disney Cereals Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">2002 M&amp;M Candy Commercial</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Alvin and the Chipmunks: The Chipmunk Adventure (1998 VHS)</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Atlantis: The Lost Empire (VHS)</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Big Trouble in Little China (720p)</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Captured File 001-1</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">DVD Recording (Jan 24, 2025)</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Gunsmith Cats (Deinterlaced)</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Jurassic Park (1997 Thanksgiving Tape)</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Pokemon: The First Movie (Mewtwo Strikes Back) (VHS)</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Pokemon: The Movie 2000 (VHS)</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Shrek (2001 VHS)</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Steamboat Willie (1928)</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Twin Peaks :: Twin Peaks S01E02 - Zen, Or The Skill To Catch A Killer</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Twin Peaks :: Twin Peaks S01E03 - Rest In Pain</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Twin Peaks :: Twin Peaks S01E04 - The One-Armed Man</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Twin Peaks :: Twin Peaks S01E05 - Cooper&#x27;s Dreams</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Twin Peaks :: Twin Peaks S01E06 - Realization Time</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Twin Peaks :: Twin Peaks S01E07 - The Last Evening</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Twin Peaks :: Twin Peaks S02E20 - The Path To The Black House</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Twin Peaks :: Twin Peaks S02E21 - Miss Twin Peaks</span><span class="item-code sev-outage">500</span></li>
+<li><span class="item-title">Twin Peaks :: Twin Peaks: International Pilot</span><span class="item-code sev-outage">500</span></li>
+      </ul>
+    </section>
+
+    <section class="group">
+      <div class="group-head">
+        <h3><span class="sev-dot sev-outage"></span>Node returned 401 Unauthorized</h3>
+        <span class="group-count">4 items</span>
+      </div>
+      <p class="group-note">A storage node is rejecting the request outright — same collection, same outage window as the 500s above.</p>
+      <ul class="item-list">
+        <li><span class="item-title">2001 Big Fat Liar Movie Release Commercial</span><span class="item-code sev-outage">401</span></li>
+<li><span class="item-title">2001 Fox23 United We Stand 9-11 Commercial</span><span class="item-code sev-outage">401</span></li>
+<li><span class="item-title">2001 Mountain Dew Soda Samurai Commercial</span><span class="item-code sev-outage">401</span></li>
+<li><span class="item-title">2001 Taco Bell Commercial</span><span class="item-code sev-outage">401</span></li>
+      </ul>
+    </section>
+
+    <section class="group">
+      <div class="group-head">
+        <h3><span class="sev-dot sev-dead"></span>Connection timeout / unreachable host</h3>
+        <span class="group-count">2 items</span>
+      </div>
+      <p class="group-note">The node hostname doesn&#x27;t respond at all. Likely retired/renamed by Internet Archive since this URL was saved.</p>
+      <ul class="item-list">
+        <li><span class="item-title">Harry Potter and the Chamber of Secrets</span><span class="item-code sev-dead">000</span></li>
+<li><span class="item-title">Harry Potter and the Sorcerer&#x27;s Stone (VHS)</span><span class="item-code sev-dead">000</span></li>
+      </ul>
+    </section>
+
+    <section class="group">
+      <div class="group-head">
+        <h3><span class="sev-dot sev-dead"></span>Redirects to a dead node</h3>
+        <span class="group-count">1 item</span>
+      </div>
+      <p class="group-note">The file redirects to a second node that also fails to respond — a chained version of the timeout above.</p>
+      <ul class="item-list">
+        <li><span class="item-title">2002 Fuccillo Ford Dealership Commercial</span><span class="item-code sev-dead">301</span></li>
+      </ul>
+    </section>
+
+    <section class="group">
+      <div class="group-head">
+        <h3><span class="sev-dot sev-expected"></span>Blocked (Google Drive iframe, expected via curl)</h3>
+        <span class="group-count">1 item</span>
+      </div>
+      <p class="group-note">This URL is a Google Drive preview iframe by design — Google blocks direct script access. It works fine loaded inside the actual page.</p>
+      <ul class="item-list">
+        <li><span class="item-title">Drive Channel</span><span class="item-code sev-expected">403</span></li>
+      </ul>
+    </section>
+
+  <h2 class="section-label">What to actually watch</h2>
+  <div class="next-steps">
+    <ol>
+      <li>The 3 genuine dead links (2 timeouts + 1 dead-node redirect) are worth a look independent of the outage — Internet Archive periodically moves items to new storage nodes, which quietly breaks hardcoded node hostnames like <code>ia601306.us.archive.org</code>. The fix is swapping those specific URLs for the generic <code>archive.org/download/&lt;item&gt;/&lt;file&gt;</code> form, which always redirects to wherever the file currently lives.</li>
+      <li>The 4 <code>401</code>s are on the same <code>2001VariousCommercials</code> collection as several <code>500</code>s above — almost certainly the same outage, not a separate permissions problem.</li>
+      <li>Re-run this same check in a few hours. If the <code>503</code>/<code>500</code> group hasn't cleared, it's worth checking Internet Archive's own status channels rather than editing the playlist.</li>
+    </ol>
+  </div>
+
+  <footer>tv-playlist.json — mainContent + episodes + commercials, 125 entries total.</footer>
+</main>
